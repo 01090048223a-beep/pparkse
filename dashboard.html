@@ -775,14 +775,17 @@
       <button class="report-settings-toggle" onclick="toggleReportSettings()">⚙️ API 설정</button>
     </div>
 
-    <!-- 브랜드 선택 -->
-    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+    <!-- 브랜드 선택 + 키 상태 -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;flex-wrap:wrap;">
       <label style="font-size:13px;font-weight:600;color:var(--text-muted);white-space:nowrap;">브랜드 선택</label>
-      <select id="brand-selector" onchange="selectBrand(this.value)" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer;">
+      <select id="brand-selector" onchange="selectBrand(this.value)" style="flex:1;min-width:160px;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer;">
         <option value="">── 브랜드를 선택하세요 ──</option>
         <option value="온육집">🥩 온육집</option>
         <option value="custom">+ 직접 입력 (설정에서 추가)</option>
       </select>
+      <div id="key-status-badge" onclick="openSetupWizard()" style="cursor:pointer;display:flex;align-items:center;gap:6px;background:var(--surface2);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:12px;white-space:nowrap;">
+        <span id="key-status-icon">⚪</span><span id="key-status-text" style="color:var(--text-muted);">키 미설정</span>
+      </div>
     </div>
 
     <!-- API 설정 (접이식) -->
@@ -839,6 +842,37 @@
     </div>
   </div>
 
+</div>
+
+<!-- ── 첫 실행 설정 마법사 ── -->
+<div id="setup-wizard-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:999;align-items:center;justify-content:center;">
+  <div style="background:#161b22;border:1px solid #30363d;border-radius:16px;padding:32px;width:100%;max-width:480px;box-shadow:0 24px 60px rgba(0,0,0,0.6);">
+    <div style="text-align:center;margin-bottom:24px;">
+      <div style="font-size:36px;margin-bottom:10px;">🔑</div>
+      <h2 style="font-size:20px;font-weight:700;color:#e6edf3;margin-bottom:6px;">처음 한 번만 입력하세요</h2>
+      <p style="font-size:13px;color:#8b949e;line-height:1.6;">저장 후에는 브랜드 선택만 하면 보고서가 자동 생성돼요.<br>입력 정보는 이 브라우저에만 안전하게 저장됩니다.</p>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:14px;">
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:#8b949e;margin-bottom:6px;letter-spacing:0.5px;">CLAUDE API 키</label>
+        <input id="wizard-api-key" type="password" placeholder="sk-ant-api03-..." autocomplete="off"
+          style="width:100%;background:#21262d;border:1px solid #30363d;border-radius:8px;padding:10px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:monospace;" />
+        <div style="font-size:11px;color:#8b949e;margin-top:4px;">console.anthropic.com → API Keys에서 발급</div>
+      </div>
+      <div>
+        <label style="display:block;font-size:12px;font-weight:600;color:#8b949e;margin-bottom:6px;letter-spacing:0.5px;">META 액세스 토큰</label>
+        <input id="wizard-meta-token" type="password" placeholder="EAAg..." autocomplete="off"
+          style="width:100%;background:#21262d;border:1px solid #30363d;border-radius:8px;padding:10px 12px;color:#e6edf3;font-size:13px;outline:none;font-family:monospace;" />
+        <div style="font-size:11px;color:#8b949e;margin-top:4px;">developers.facebook.com/tools/explorer → 토큰 생성</div>
+      </div>
+    </div>
+    <button onclick="saveWizardKeys()" style="margin-top:22px;width:100%;padding:13px;background:linear-gradient(135deg,#238636,#2ea043);border:none;border-radius:8px;color:#fff;font-size:15px;font-weight:700;cursor:pointer;letter-spacing:-0.3px;">
+      ✅ 저장하고 시작하기
+    </button>
+    <button onclick="skipWizard()" style="margin-top:10px;width:100%;padding:9px;background:transparent;border:1px solid #30363d;border-radius:8px;color:#8b949e;font-size:13px;cursor:pointer;">
+      나중에 입력할게요 (⚙️ API 설정에서 직접 입력)
+    </button>
+  </div>
 </div>
 
 <!-- ── 김비서 모달 ── -->
@@ -1224,6 +1258,7 @@ function saveReportSettings() {
     if (val) localStorage.setItem('kimbi_' + key, val);
   });
   document.getElementById('report-settings-area').classList.remove('open');
+  updateKeyStatusBadge();
   showReportToast('✅ 설정 저장 완료');
 }
 
@@ -1273,8 +1308,7 @@ async function runWeeklyReport() {
   const cpaLast = getReportVal('cpa-last');
   const notes   = getReportVal('notes');
 
-  if (!apiKey)  { showReportToast('⚙️ API 설정에서 Claude API 키를 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
-  if (!token)   { showReportToast('⚙️ API 설정에서 Meta 토큰을 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
+  if (!apiKey || !token) { openSetupWizard(); return; }
   if (!account) { showReportToast('⚙️ API 설정에서 광고 계정 ID를 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
   if (!brand)   { showReportToast('⚙️ API 설정에서 브랜드명을 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
 
@@ -1414,15 +1448,73 @@ function showReportToast(msg) {
   setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, 2500);
 }
 
+// ── 첫 실행 마법사 ──────────────────────────────────
+function openSetupWizard() {
+  document.getElementById('setup-wizard-overlay').style.display = 'flex';
+  // 저장된 값 있으면 미리 채우기 (업데이트용)
+  const k = localStorage.getItem('kimbi_api-key');
+  const t = localStorage.getItem('kimbi_meta-token');
+  if (k) document.getElementById('wizard-api-key').value = k;
+  if (t) document.getElementById('wizard-meta-token').value = t;
+}
+
+function saveWizardKeys() {
+  const k = document.getElementById('wizard-api-key').value.trim();
+  const t = document.getElementById('wizard-meta-token').value.trim();
+  if (!k && !t) { alert('최소 하나의 키를 입력해주세요.'); return; }
+  if (k) localStorage.setItem('kimbi_api-key', k);
+  if (t) localStorage.setItem('kimbi_meta-token', t);
+  localStorage.setItem('kimbi_setup-done', '1');
+  document.getElementById('setup-wizard-overlay').style.display = 'none';
+  updateKeyStatusBadge();
+  loadReportSettings();
+  showReportToast('✅ 키 저장 완료! 이제 브랜드 선택 후 바로 생성할 수 있어요.');
+}
+
+function skipWizard() {
+  localStorage.setItem('kimbi_setup-done', '1');
+  document.getElementById('setup-wizard-overlay').style.display = 'none';
+}
+
+function updateKeyStatusBadge() {
+  const hasKey   = !!localStorage.getItem('kimbi_api-key');
+  const hasToken = !!localStorage.getItem('kimbi_meta-token');
+  const icon = document.getElementById('key-status-icon');
+  const text = document.getElementById('key-status-text');
+  if (hasKey && hasToken) {
+    icon.textContent = '🟢';
+    text.textContent = '키 등록 완료';
+    text.style.color = '#3fb950';
+  } else if (hasKey || hasToken) {
+    icon.textContent = '🟡';
+    text.textContent = '일부 키 미등록';
+    text.style.color = '#ffa657';
+  } else {
+    icon.textContent = '🔴';
+    text.textContent = '키 미설정 (클릭)';
+    text.style.color = '#f78166';
+  }
+}
+
 // 페이지 로드 시 저장된 설정 적용
 window.addEventListener('DOMContentLoaded', () => {
   loadReportSettings();
+  updateKeyStatusBadge();
+
   // 저장된 브랜드 자동 선택
   const savedBrand = localStorage.getItem('kimbi_meta-brand');
   if (savedBrand) {
     const sel = document.getElementById('brand-selector');
     const opt = [...sel.options].find(o => o.value === savedBrand);
     if (opt) sel.value = savedBrand;
+  }
+
+  // 첫 실행이면 자동으로 마법사 열기
+  const setupDone = localStorage.getItem('kimbi_setup-done');
+  const hasKey    = localStorage.getItem('kimbi_api-key');
+  const hasToken  = localStorage.getItem('kimbi_meta-token');
+  if (!setupDone && (!hasKey || !hasToken)) {
+    setTimeout(() => openSetupWizard(), 600);
   }
 });
 
