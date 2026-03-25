@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>김비서 - 주간보고 자동화</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+      background: #f0f2f5;
+      min-height: 100vh;
+      padding: 32px 16px;
+    }
+
+    .container {
+      max-width: 860px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 32px;
+    }
+
+    header h1 {
+      font-size: 28px;
+      font-weight: 700;
+      color: #1a1a2e;
+    }
+
+    header p {
+      margin-top: 8px;
+      color: #666;
+      font-size: 14px;
+    }
+
+    .card {
+      background: #fff;
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+      margin-bottom: 20px;
+    }
+
+    .card h2 {
+      font-size: 16px;
+      font-weight: 600;
+      color: #333;
+      margin-bottom: 18px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+
+    .api-row {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .api-row input {
+      flex: 1;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .form-group.full {
+      grid-column: 1 / -1;
+    }
+
+    label {
+      font-size: 13px;
+      font-weight: 600;
+      color: #444;
+    }
+
+    label span {
+      font-weight: 400;
+      color: #999;
+      font-size: 12px;
+    }
+
+    input, textarea {
+      border: 1.5px solid #e0e0e0;
+      border-radius: 8px;
+      padding: 10px 12px;
+      font-size: 14px;
+      font-family: inherit;
+      color: #333;
+      transition: border-color 0.2s;
+      outline: none;
+      background: #fafafa;
+    }
+
+    input:focus, textarea:focus {
+      border-color: #4f46e5;
+      background: #fff;
+    }
+
+    textarea {
+      resize: vertical;
+      min-height: 80px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 12px 24px;
+      border-radius: 10px;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+
+    .btn-primary {
+      background: #4f46e5;
+      color: #fff;
+      width: 100%;
+      justify-content: center;
+      font-size: 16px;
+      padding: 14px;
+    }
+
+    .btn-primary:hover { background: #4338ca; }
+    .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
+
+    .btn-copy {
+      background: #f0f2f5;
+      color: #444;
+      font-size: 14px;
+      padding: 8px 16px;
+    }
+
+    .btn-copy:hover { background: #e2e8f0; }
+    .btn-save {
+      background: #ecfdf5;
+      color: #065f46;
+      font-size: 13px;
+      padding: 8px 14px;
+    }
+    .btn-save:hover { background: #d1fae5; }
+
+    .output-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #f0f2f5;
+    }
+
+    .output-header h2 { border: none; margin: 0; padding: 0; }
+
+    #output-box {
+      background: #f8f9fa;
+      border: 1.5px solid #e9ecef;
+      border-radius: 10px;
+      padding: 20px;
+      font-size: 14px;
+      line-height: 1.8;
+      white-space: pre-wrap;
+      color: #222;
+      min-height: 120px;
+      font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    }
+
+    .loading {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      color: #6366f1;
+      font-size: 14px;
+      padding: 20px;
+      justify-content: center;
+    }
+
+    .spinner {
+      width: 20px;
+      height: 20px;
+      border: 2px solid #e0e7ff;
+      border-top-color: #6366f1;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      left: 50%;
+      transform: translateX(-50%) translateY(20px);
+      background: #1a1a2e;
+      color: #fff;
+      padding: 10px 22px;
+      border-radius: 100px;
+      font-size: 14px;
+      opacity: 0;
+      transition: all 0.3s;
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    .toast.show {
+      opacity: 1;
+      transform: translateX(-50%) translateY(0);
+    }
+
+    .hint {
+      font-size: 12px;
+      color: #999;
+      margin-top: 4px;
+    }
+  </style>
+</head>
+<body>
+
+<div class="container">
+  <header>
+    <h1>🤖 김비서</h1>
+    <p>메타 광고 주간보고 자동 생성기 | 매주 월요일 카카오톡 보고용</p>
+  </header>
+
+  <!-- API Key -->
+  <div class="card">
+    <h2>🔑 Claude API 키</h2>
+    <div class="api-row">
+      <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+      <button class="btn btn-save" onclick="saveKey()">저장</button>
+    </div>
+    <p class="hint">API 키는 브라우저에만 저장됩니다. 외부로 전송되지 않습니다.</p>
+  </div>
+
+  <!-- 입력 폼 -->
+  <div class="card">
+    <h2>📋 광고 데이터 입력</h2>
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>브랜드명</label>
+        <input type="text" id="brand" placeholder="예: 하이콴" />
+      </div>
+
+      <div class="form-group">
+        <label>보고 기간</label>
+        <input type="text" id="period" placeholder="예: 3/16~3/22" />
+      </div>
+
+      <div class="form-group">
+        <label>DB <span>(전환 건수)</span></label>
+        <input type="number" id="db" placeholder="예: 11" />
+      </div>
+
+      <div class="form-group">
+        <label>지출 비용 <span>(원)</span></label>
+        <input type="number" id="spend" placeholder="예: 690804" />
+      </div>
+
+      <div class="form-group">
+        <label>이번 주 CPA <span>(원)</span></label>
+        <input type="number" id="cpa-this" placeholder="예: 62800" />
+      </div>
+
+      <div class="form-group">
+        <label>전주 CPA <span>(원, 비교용)</span></label>
+        <input type="number" id="cpa-last" placeholder="예: 85407" />
+      </div>
+
+      <div class="form-group">
+        <label>CTR <span>(%)</span></label>
+        <input type="text" id="ctr" placeholder="예: 2.27" />
+      </div>
+
+      <div class="form-group">
+        <label>베스트 소재명</label>
+        <input type="text" id="best-creative" placeholder="예: [인터뷰] 정이랑 배우 영상" />
+      </div>
+
+      <div class="form-group full">
+        <label>소재 메인 카피 <span>(있을 경우)</span></label>
+        <input type="text" id="copy" placeholder="예: '정이랑이 선택한 쌀국수'" />
+      </div>
+
+      <div class="form-group full">
+        <label>특이사항 / 운영 메모 <span>(선택)</span></label>
+        <textarea id="notes" placeholder="예: 신규 대표님 인터뷰 소재 투입, CPC 편차 발생 중, 특정 소구점 반응 좋음 등"></textarea>
+      </div>
+
+    </div>
+  </div>
+
+  <button class="btn btn-primary" id="gen-btn" onclick="generate()">
+    ✍️ 보고서 생성
+  </button>
+
+  <!-- 출력 -->
+  <div class="card" style="margin-top: 20px;" id="output-card">
+    <div class="output-header">
+      <h2>📨 생성된 보고서</h2>
+      <button class="btn btn-copy" onclick="copyOutput()">📋 복사</button>
+    </div>
+    <div id="output-box">여기에 생성된 보고서가 출력됩니다.</div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+  const SYSTEM_PROMPT = `당신은 김비서입니다. 매주 월요일, 전주 메타 광고 운영 데이터를 분석하고 카카오톡 보고용 메시지를 작성하는 광고 운영 보고 전문 AI 비서입니다.
+
+아래 규칙에 따라 보고서를 작성하세요.
+
+## 전체 구조
+[{브랜드명} 전주 광고데이터 공유]
+
+{인사말 한 줄}
+
+📊 전주 데이터 (*{기간})
+- DB : {건수}건
+- 지출 비용 : {비용}원
+- CPA (전환당 비용) : {CPA}원 (전주 {전주CPA}원)
+- CTR (클릭률) : {CTR}%
+
+🔍 운영 인사이트
+① {인사이트1 - 성과 좋은 소재/소구점 이유 분석}
+② {인사이트2 - 신규 소재 또는 변화 요인}
+③ {인사이트3 - 개선 필요 지표 + 대응 방향}
+
+🔥 베스트 소재
+소재 : {소재명}
+메인 카피 : "{카피}" (카피가 있을 경우)
+> {소재 효과 해석 - 예비창업자 심리와 연결}
+
+🚀 향후 운영 방향
+① {효율 지표 중심 예산 운영 전략}
+② {소재 확장 또는 최적화 계획}
+
+## 작성 규칙
+- 경어체 유지 (~드립니다, ~하겠습니다)
+- 전문 용어는 괄호로 풀어서 병기: CPA (전환당 비용), CTR (클릭률), CPC (클릭당 비용)
+- 이모지는 섹션 헤더에만 사용
+- 광고 성과를 예비창업자 관점에서 해석 (심리적 장벽, 신뢰도, 운영 편의성)
+- 숫자는 천 단위 콤마 포함하여 표기 (예: 690,804원)
+- CPA 전주 대비 개선 시 → 소재 효율 강조 / 상승 시 → 신규 소재 학습 기간 또는 테스트 성과로 해석
+- 인사이트는 현상 + 해석 구조로 2~3문장 이내
+- 마크다운 없이 순수 텍스트로만 출력 (**, ## 등 사용 금지)`;
+
+  // 저장된 API 키 불러오기
+  window.onload = () => {
+    const saved = localStorage.getItem('claude_api_key');
+    if (saved) document.getElementById('api-key').value = saved;
+  };
+
+  function saveKey() {
+    const key = document.getElementById('api-key').value.trim();
+    if (key) {
+      localStorage.setItem('claude_api_key', key);
+      showToast('API 키가 저장되었습니다.');
+    }
+  }
+
+  async function generate() {
+    const apiKey = document.getElementById('api-key').value.trim();
+    if (!apiKey) { showToast('API 키를 입력해주세요.'); return; }
+
+    const brand       = document.getElementById('brand').value.trim();
+    const period      = document.getElementById('period').value.trim();
+    const db          = document.getElementById('db').value.trim();
+    const spend       = document.getElementById('spend').value.trim();
+    const cpaThis     = document.getElementById('cpa-this').value.trim();
+    const cpaLast     = document.getElementById('cpa-last').value.trim();
+    const ctr         = document.getElementById('ctr').value.trim();
+    const bestCreative = document.getElementById('best-creative').value.trim();
+    const copy        = document.getElementById('copy').value.trim();
+    const notes       = document.getElementById('notes').value.trim();
+
+    if (!brand || !period || !db || !spend || !cpaThis || !cpaLast || !ctr) {
+      showToast('필수 항목을 모두 입력해주세요.'); return;
+    }
+
+    const userMessage = `김비서, 이번 주 보고서 작성해줘.
+
+브랜드: ${brand}
+기간: ${period}
+DB: ${db}건
+지출: ${Number(spend).toLocaleString()}원
+이번주 CPA: ${Number(cpaThis).toLocaleString()}원
+전주 CPA: ${Number(cpaLast).toLocaleString()}원
+CTR: ${ctr}%
+베스트 소재: ${bestCreative || '없음'}
+메인 카피: ${copy || '없음'}
+특이사항: ${notes || '없음'}`;
+
+    const btn = document.getElementById('gen-btn');
+    const box = document.getElementById('output-box');
+
+    btn.disabled = true;
+    btn.textContent = '생성 중...';
+    box.innerHTML = '<div class="loading"><div class="spinner"></div>김비서가 보고서를 작성하고 있습니다...</div>';
+
+    try {
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'x-api-key': apiKey,
+          'anthropic-version': '2023-06-01',
+          'anthropic-dangerous-direct-browser-access': 'true'
+        },
+        body: JSON.stringify({
+          model: 'claude-opus-4-6',
+          max_tokens: 2048,
+          system: SYSTEM_PROMPT,
+          messages: [{ role: 'user', content: userMessage }]
+        })
+      });
+
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      const text = data.content?.[0]?.text || '응답을 받지 못했습니다.';
+      box.textContent = text;
+
+    } catch (e) {
+      box.textContent = '오류가 발생했습니다: ' + e.message;
+    } finally {
+      btn.disabled = false;
+      btn.textContent = '✍️ 보고서 생성';
+    }
+  }
+
+  function copyOutput() {
+    const text = document.getElementById('output-box').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      showToast('클립보드에 복사되었습니다!');
+    });
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 2500);
+  }
+</script>
+</body>
+</html>
