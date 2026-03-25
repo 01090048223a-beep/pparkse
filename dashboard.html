@@ -322,6 +322,115 @@
     color: var(--text-muted);
   }
 
+  /* ── 주간보고 카드 ── */
+  .report-section {
+    margin-top: 20px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 24px;
+  }
+  .report-section-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; padding-bottom: 14px;
+    border-bottom: 1px solid var(--border);
+  }
+  .report-section-title {
+    font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .report-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 16px;
+    margin-bottom: 20px;
+  }
+  .report-field { display: flex; flex-direction: column; gap: 6px; }
+  .report-field label { font-size: 12px; font-weight: 600; color: var(--text-muted); }
+  .report-field input {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 8px; padding: 9px 12px;
+    color: var(--text); font-size: 13px; outline: none;
+    transition: border-color 0.2s; font-family: inherit;
+  }
+  .report-field input:focus { border-color: var(--accent); }
+  .report-field input[type="password"] { color: var(--text-muted); }
+
+  .btn-report-run {
+    width: 100%;
+    background: linear-gradient(135deg, #1877f2 0%, #58a6ff 100%);
+    color: #fff; border: none; border-radius: 10px;
+    padding: 15px; font-size: 16px; font-weight: 700;
+    cursor: pointer; transition: all 0.2s;
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    box-shadow: 0 4px 14px rgba(88,166,255,0.25);
+    letter-spacing: -0.3px;
+  }
+  .btn-report-run:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-report-run:disabled { opacity: 0.5; cursor: not-allowed; transform: none; filter: none; }
+
+  .report-progress {
+    display: none; margin-top: 16px;
+    background: var(--surface2); border-radius: 10px; padding: 16px 20px;
+    border: 1px solid var(--border);
+  }
+  .report-progress.visible { display: block; }
+  .r-step { display: flex; align-items: center; gap: 10px; font-size: 13px; color: var(--text-muted); margin-bottom: 10px; }
+  .r-step:last-child { margin-bottom: 0; }
+  .r-step.active { color: var(--accent); font-weight: 600; }
+  .r-step.done { color: var(--accent2); }
+  .r-step.err { color: var(--accent3); }
+  .r-step-icon {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--surface); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; flex-shrink: 0;
+  }
+  .r-step.active .r-step-icon { background: #1a3a5c; border-color: var(--accent); animation: pulse 1.5s infinite; }
+  .r-step.done .r-step-icon { background: #0d3321; border-color: var(--accent2); }
+  .r-step.err .r-step-icon { background: #2d0c0c; border-color: var(--accent3); }
+
+  .report-data-preview {
+    display: none; margin-top: 12px; padding: 10px 14px;
+    background: #0d1e38; border: 1px solid #1f3a5c; border-radius: 8px;
+    font-size: 12px; color: #79c0ff; line-height: 1.8;
+  }
+  .report-data-preview.visible { display: block; }
+
+  .report-output-wrap {
+    display: none; margin-top: 16px;
+  }
+  .report-output-wrap.visible { display: block; }
+  .report-output-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 10px;
+  }
+  .report-output-header span { font-size: 13px; font-weight: 600; color: var(--text-muted); }
+  .btn-copy-report {
+    background: var(--surface2); border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 6px;
+    padding: 5px 12px; font-size: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .btn-copy-report:hover { border-color: var(--accent); color: var(--accent); }
+  #report-output-box {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: 10px; padding: 18px 20px;
+    font-size: 13px; line-height: 1.9; white-space: pre-wrap;
+    color: var(--text); max-height: 480px; overflow-y: auto;
+    font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+  }
+  #report-output-box::-webkit-scrollbar { width: 4px; }
+  #report-output-box::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .report-settings-toggle {
+    background: none; border: 1px solid var(--border);
+    color: var(--text-muted); border-radius: 8px;
+    padding: 5px 12px; font-size: 12px; cursor: pointer;
+    transition: all 0.2s;
+  }
+  .report-settings-toggle:hover { border-color: var(--accent); color: var(--accent); }
+  .report-settings-area { display: none; margin-bottom: 16px; }
+  .report-settings-area.open { display: block; }
+
   /* ── 김비서 모달 ── */
   .secretary-overlay {
     display: none;
@@ -656,6 +765,80 @@
     </div>
 
   </div>
+
+  <!-- ── 주간보고 자동화 ── -->
+  <div class="report-section">
+    <div class="report-section-header">
+      <div class="report-section-title">
+        <span>🤖</span> 김비서 · 메타 광고 주간보고 자동 생성
+      </div>
+      <button class="report-settings-toggle" onclick="toggleReportSettings()">⚙️ API 설정</button>
+    </div>
+
+    <!-- 브랜드 선택 -->
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;">
+      <label style="font-size:13px;font-weight:600;color:var(--text-muted);white-space:nowrap;">브랜드 선택</label>
+      <select id="brand-selector" onchange="selectBrand(this.value)" style="flex:1;background:var(--surface2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;color:var(--text);font-size:13px;outline:none;cursor:pointer;">
+        <option value="">── 브랜드를 선택하세요 ──</option>
+        <option value="온육집">🥩 온육집</option>
+        <option value="custom">+ 직접 입력 (설정에서 추가)</option>
+      </select>
+    </div>
+
+    <!-- API 설정 (접이식) -->
+    <div class="report-settings-area" id="report-settings-area">
+      <div class="report-grid">
+        <div class="report-field">
+          <label>Claude API 키</label>
+          <input type="password" id="r-api-key" placeholder="sk-ant-api03-..." />
+        </div>
+        <div class="report-field">
+          <label>Meta 액세스 토큰</label>
+          <input type="password" id="r-meta-token" placeholder="EAAg..." />
+        </div>
+        <div class="report-field">
+          <label>광고 계정 ID</label>
+          <input type="text" id="r-meta-account" placeholder="act_1585007079431077" />
+        </div>
+        <div class="report-field">
+          <label>브랜드명</label>
+          <input type="text" id="r-meta-brand" placeholder="예: 온육집" />
+        </div>
+        <div class="report-field">
+          <label>전주 CPA (없으면 0)</label>
+          <input type="number" id="r-cpa-last" placeholder="예: 85407" />
+        </div>
+        <div class="report-field">
+          <label>특이사항 메모 (선택)</label>
+          <input type="text" id="r-notes" placeholder="예: 신규 소재 투입 등" />
+        </div>
+      </div>
+      <button class="btn-copy-report" onclick="saveReportSettings()" style="margin-bottom:16px;">💾 설정 저장</button>
+    </div>
+
+    <!-- 메인 버튼 -->
+    <button class="btn-report-run" id="report-run-btn" onclick="runWeeklyReport()">
+      🚀 전주 Meta 데이터 가져오고 보고서 자동 생성
+    </button>
+
+    <!-- 진행 상태 -->
+    <div class="report-progress" id="report-progress">
+      <div class="r-step" id="rs-1"><div class="r-step-icon">1</div><span>Meta API에서 전주 광고 데이터 수집 중...</span></div>
+      <div class="r-step" id="rs-2"><div class="r-step-icon">2</div><span>베스트 소재 분석 중...</span></div>
+      <div class="r-step" id="rs-3"><div class="r-step-icon">3</div><span>김비서가 보고서 작성 중...</span></div>
+      <div class="report-data-preview" id="report-data-preview"></div>
+    </div>
+
+    <!-- 보고서 출력 -->
+    <div class="report-output-wrap" id="report-output-wrap">
+      <div class="report-output-header">
+        <span>📨 생성된 보고서</span>
+        <button class="btn-copy-report" onclick="copyWeeklyReport()">📋 복사</button>
+      </div>
+      <div id="report-output-box"></div>
+    </div>
+  </div>
+
 </div>
 
 <!-- ── 김비서 모달 ── -->
@@ -939,6 +1122,309 @@ function updateChart(product, amount) {
   const el = document.querySelector('.summary-card.green .summary-value');
   if (el) el.textContent = Math.round(total/10000).toLocaleString() + '만원';
 }
+
+// ── 주간보고 자동화 ──────────────────────────────────
+
+const REPORT_SYSTEM_PROMPT = `당신은 김비서입니다. 매주 월요일, 전주 메타 광고 운영 데이터를 분석하고 카카오톡 보고용 메시지를 작성하는 광고 운영 보고 전문 AI 비서입니다.
+
+아래 규칙에 따라 보고서를 작성하세요.
+
+## 전체 구조
+[{브랜드명} 전주 광고데이터 공유]
+
+{인사말 한 줄}
+
+📊 전주 데이터 (*{기간})
+- DB : {건수}건
+- 지출 비용 : {비용}원
+- CPA (전환당 비용) : {CPA}원 (전주 {전주CPA}원)
+- CTR (클릭률) : {CTR}%
+
+🔍 운영 인사이트
+① {인사이트1 - 성과 좋은 소재/소구점 이유 분석}
+② {인사이트2 - 신규 소재 또는 변화 요인}
+③ {인사이트3 - 개선 필요 지표 + 대응 방향}
+
+🔥 베스트 소재
+소재 : {소재명}
+메인 카피 : "{카피}" (카피가 있을 경우에만)
+> {소재 효과 해석 - 예비창업자 심리와 연결}
+
+🚀 향후 운영 방향
+① {효율 지표 중심 예산 운영 전략}
+② {소재 확장 또는 최적화 계획}
+
+## 작성 규칙
+- 경어체 유지 (~드립니다, ~하겠습니다)
+- 전문 용어는 괄호로 풀어서 병기: CPA (전환당 비용), CTR (클릭률), CPC (클릭당 비용)
+- 이모지는 섹션 헤더에만 사용
+- 광고 성과를 예비창업자 관점에서 해석 (심리적 장벽, 신뢰도, 운영 편의성)
+- 숫자는 천 단위 콤마 포함하여 표기 (예: 690,804원)
+- 전주 CPA가 0이면 "전주 데이터 없음"으로 표기
+- CPA 전주 대비 개선 시 → 소재 효율 강조 / 상승 시 → 신규 소재 학습 기간 또는 테스트 성과로 해석
+- 인사이트는 현상 + 해석 구조로 2~3문장 이내
+- 마크다운 없이 순수 텍스트로만 출력 (**, ## 등 사용 금지)`;
+
+// 브랜드 프리셋 (계정 ID 등 고정 정보 저장)
+const BRAND_PRESETS = {
+  '온육집': {
+    account: 'act_1585007079431077',
+    brand: '온육집',
+    notes: '배달숯불갈비 예비창업자 대상, 방송 재가공 소재 운영 중',
+  }
+};
+
+function selectBrand(val) {
+  if (!val || val === 'custom') {
+    // 직접 입력 선택 시 설정 패널 열기
+    if (val === 'custom') {
+      document.getElementById('report-settings-area').classList.add('open');
+      loadReportSettings();
+    }
+    return;
+  }
+  const preset = BRAND_PRESETS[val];
+  if (!preset) return;
+
+  // localStorage에 저장된 토큰 + API 키는 유지, 나머지만 프리셋 적용
+  localStorage.setItem('kimbi_meta-account', preset.account);
+  localStorage.setItem('kimbi_meta-brand', preset.brand);
+  if (preset.notes) localStorage.setItem('kimbi_notes', preset.notes);
+
+  // 설정 패널이 열려있으면 필드도 업데이트
+  const area = document.getElementById('report-settings-area');
+  if (area.classList.contains('open')) loadReportSettings();
+
+  showReportToast(`✅ ${val} 브랜드 정보 적용 완료!`);
+}
+
+function toggleReportSettings() {
+  const area = document.getElementById('report-settings-area');
+  area.classList.toggle('open');
+  // 열릴 때 저장된 값 로드
+  if (area.classList.contains('open')) loadReportSettings();
+}
+
+function loadReportSettings() {
+  const fields = ['r-api-key','r-meta-token','r-meta-account','r-meta-brand','r-cpa-last','r-notes'];
+  fields.forEach(id => {
+    const val = localStorage.getItem('kimbi_' + id.replace('r-',''));
+    if (val && document.getElementById(id)) document.getElementById(id).value = val;
+  });
+}
+
+function saveReportSettings() {
+  const map = {
+    'r-api-key': 'api-key', 'r-meta-token': 'meta-token',
+    'r-meta-account': 'meta-account', 'r-meta-brand': 'meta-brand',
+    'r-cpa-last': 'cpa-last', 'r-notes': 'notes'
+  };
+  Object.entries(map).forEach(([rid, key]) => {
+    const val = document.getElementById(rid)?.value?.trim();
+    if (val) localStorage.setItem('kimbi_' + key, val);
+  });
+  document.getElementById('report-settings-area').classList.remove('open');
+  showReportToast('✅ 설정 저장 완료');
+}
+
+// 저장된 값 가져오기 (r- 필드 우선, 없으면 localStorage)
+function getReportVal(key) {
+  const el = document.getElementById('r-' + key);
+  if (el && el.value.trim()) return el.value.trim();
+  return localStorage.getItem('kimbi_' + key) || '';
+}
+
+function getLastWeekRange() {
+  const today = new Date();
+  const dow = today.getDay();
+  const back = dow === 0 ? 6 : dow - 1;
+  const thisMon = new Date(today); thisMon.setDate(today.getDate() - back);
+  const lastMon = new Date(thisMon); lastMon.setDate(thisMon.getDate() - 7);
+  const lastSun = new Date(lastMon); lastSun.setDate(lastMon.getDate() + 6);
+  const prevMon = new Date(lastMon); prevMon.setDate(lastMon.getDate() - 7);
+  const prevSun = new Date(lastSun); prevSun.setDate(lastSun.getDate() - 7);
+  const fmt = d => d.toISOString().split('T')[0];
+  const disp = d => `${d.getMonth()+1}/${d.getDate()}`;
+  return {
+    since: fmt(lastMon), until: fmt(lastSun),
+    prevSince: fmt(prevMon), prevUntil: fmt(prevSun),
+    label: `${disp(lastMon)}~${disp(lastSun)}`
+  };
+}
+
+function getLeadsFromData(d) {
+  const acts = d?.actions || [];
+  const types = ['lead','offsite_conversion.fb_pixel_lead','onsite_conversion.lead_grouped'];
+  return acts.filter(a => types.includes(a.action_type)).reduce((s, a) => s + Number(a.value), 0);
+}
+
+function setRStep(n, state) {
+  const el = document.getElementById('rs-' + n);
+  el.className = 'r-step ' + state;
+  const icons = { active:'⟳', done:'✓', err:'✕' };
+  el.querySelector('.r-step-icon').textContent = icons[state] || n;
+}
+
+async function runWeeklyReport() {
+  const apiKey  = getReportVal('api-key');
+  const token   = getReportVal('meta-token');
+  const account = getReportVal('meta-account');
+  const brand   = getReportVal('meta-brand');
+  const cpaLast = getReportVal('cpa-last');
+  const notes   = getReportVal('notes');
+
+  if (!apiKey)  { showReportToast('⚙️ API 설정에서 Claude API 키를 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
+  if (!token)   { showReportToast('⚙️ API 설정에서 Meta 토큰을 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
+  if (!account) { showReportToast('⚙️ API 설정에서 광고 계정 ID를 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
+  if (!brand)   { showReportToast('⚙️ API 설정에서 브랜드명을 입력해주세요.'); document.getElementById('report-settings-area').classList.add('open'); loadReportSettings(); return; }
+
+  const btn = document.getElementById('report-run-btn');
+  const progress = document.getElementById('report-progress');
+  const outputWrap = document.getElementById('report-output-wrap');
+  const preview = document.getElementById('report-data-preview');
+  const outputBox = document.getElementById('report-output-box');
+
+  btn.disabled = true;
+  btn.textContent = '처리 중...';
+  progress.classList.add('visible');
+  outputWrap.classList.remove('visible');
+  preview.classList.remove('visible');
+  [1,2,3].forEach(n => { const el = document.getElementById('rs-'+n); el.className='r-step'; el.querySelector('.r-step-icon').textContent=n; });
+
+  try {
+    // STEP 1: 계정 레벨
+    setRStep(1,'active');
+    const { since, until, prevSince, prevUntil, label } = getLastWeekRange();
+    const BASE = 'https://graph.facebook.com/v19.0';
+    const flds = 'spend,actions,ctr,clicks,cpc';
+
+    const [tw, pw] = await Promise.all([
+      fetch(`${BASE}/${account}/insights?fields=${flds}&time_range={"since":"${since}","until":"${until}"}&access_token=${token}`).then(r=>r.json()),
+      fetch(`${BASE}/${account}/insights?fields=${flds}&time_range={"since":"${prevSince}","until":"${prevUntil}"}&access_token=${token}`).then(r=>r.json()),
+    ]);
+    if (tw.error) throw new Error('Meta API: ' + tw.error.message);
+
+    const w = tw.data?.[0] || {};
+    const p = pw.data?.[0] || {};
+    const db = getLeadsFromData(w);
+    const spend = Math.round(Number(w.spend||0));
+    const cpa = db > 0 ? Math.round(spend/db) : 0;
+    const ctr = Number(w.ctr||0).toFixed(2);
+    const cpc = Math.round(Number(w.cpc||0));
+    const prevDb = getLeadsFromData(p);
+    const prevSpend = Math.round(Number(p.spend||0));
+    const prevCpaCalc = prevDb > 0 ? Math.round(prevSpend/prevDb) : 0;
+    const finalPrevCpa = cpaLast ? Number(cpaLast) : prevCpaCalc;
+    setRStep(1,'done');
+
+    // STEP 2: 광고 레벨 (베스트 소재)
+    setRStep(2,'active');
+    const adsRes = await fetch(
+      `${BASE}/${account}/insights?fields=ad_name,spend,actions,ctr,cpc&level=ad&time_range={"since":"${since}","until":"${until}"}&sort=["spend_descending"]&limit=10&access_token=${token}`
+    ).then(r=>r.json());
+
+    let bestAdName = '';
+    let adInsightText = '';
+    if (!adsRes.error && adsRes.data?.length > 0) {
+      const sorted = adsRes.data.sort((a,b) => getLeadsFromData(b) - getLeadsFromData(a));
+      bestAdName = sorted[0].ad_name || '';
+      adInsightText = '\n\n상위 소재 데이터:\n' + sorted.slice(0,3).map((ad,i) =>
+        `${i+1}. ${ad.ad_name} - DB ${getLeadsFromData(ad)}건, 지출 ${Math.round(Number(ad.spend||0)).toLocaleString()}원, CTR ${Number(ad.ctr||0).toFixed(2)}%, CPC ${Math.round(Number(ad.cpc||0)).toLocaleString()}원`
+      ).join('\n');
+    }
+    setRStep(2,'done');
+
+    preview.innerHTML = `📊 <strong>${label}</strong> · 지출 ${spend.toLocaleString()}원 · DB ${db}건 · CPA ${cpa.toLocaleString()}원 · CTR ${ctr}% · 베스트: ${bestAdName||'없음'}`;
+    preview.classList.add('visible');
+
+    // STEP 3: Claude 보고서
+    setRStep(3,'active');
+    const userMsg = `김비서, 이번 주 보고서 작성해줘.
+
+브랜드: ${brand}
+기간: ${label}
+DB: ${db}건
+지출: ${spend.toLocaleString()}원
+이번주 CPA: ${cpa.toLocaleString()}원
+전주 CPA: ${finalPrevCpa > 0 ? finalPrevCpa.toLocaleString()+'원' : '없음 (첫 주)'}
+CTR: ${ctr}%
+CPC: ${cpc.toLocaleString()}원
+베스트 소재: ${bestAdName || '없음'}
+특이사항: ${notes || '없음'}${adInsightText}`;
+
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': apiKey,
+        'anthropic-version': '2023-06-01',
+        'anthropic-dangerous-direct-browser-access': 'true'
+      },
+      body: JSON.stringify({
+        model: 'claude-opus-4-6',
+        max_tokens: 2048,
+        system: REPORT_SYSTEM_PROMPT,
+        messages: [{ role:'user', content: userMsg }]
+      })
+    });
+
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error('Claude API: ' + (err.error?.message || `HTTP ${res.status}`));
+    }
+
+    const data = await res.json();
+    const text = data.content?.[0]?.text || '응답 없음';
+    setRStep(3,'done');
+
+    outputBox.textContent = text;
+    outputWrap.classList.add('visible');
+    outputWrap.scrollIntoView({ behavior:'smooth', block:'nearest' });
+
+  } catch(e) {
+    [1,2,3].forEach(n => {
+      if (document.getElementById('rs-'+n).className.includes('active')) setRStep(n,'err');
+    });
+    outputBox.textContent = '❌ ' + e.message;
+    outputWrap.classList.add('visible');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '🚀 전주 Meta 데이터 가져오고 보고서 자동 생성';
+  }
+}
+
+function copyWeeklyReport() {
+  const text = document.getElementById('report-output-box').textContent;
+  if (!text || text.startsWith('❌')) { showReportToast('복사할 보고서가 없어요.'); return; }
+  navigator.clipboard.writeText(text).then(() => showReportToast('📋 보고서가 클립보드에 복사되었습니다!'));
+}
+
+function showReportToast(msg) {
+  // 재사용: 없으면 임시 div
+  let t = document.getElementById('report-toast');
+  if (!t) {
+    t = document.createElement('div');
+    t.id = 'report-toast';
+    t.style.cssText = 'position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(20px);background:#161b22;color:#e6edf3;border:1px solid #30363d;padding:10px 22px;border-radius:100px;font-size:13px;opacity:0;transition:all 0.3s;pointer-events:none;z-index:9999;';
+    document.body.appendChild(t);
+  }
+  t.textContent = msg;
+  t.style.opacity = '1';
+  t.style.transform = 'translateX(-50%) translateY(0)';
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(-50%) translateY(20px)'; }, 2500);
+}
+
+// 페이지 로드 시 저장된 설정 적용
+window.addEventListener('DOMContentLoaded', () => {
+  loadReportSettings();
+  // 저장된 브랜드 자동 선택
+  const savedBrand = localStorage.getItem('kimbi_meta-brand');
+  if (savedBrand) {
+    const sel = document.getElementById('brand-selector');
+    const opt = [...sel.options].find(o => o.value === savedBrand);
+    if (opt) sel.value = savedBrand;
+  }
+});
 
 // ── 김비서 ──────────────────────────────────────────
 function openSecretary() {

@@ -14,27 +14,11 @@
       padding: 32px 16px;
     }
 
-    .container {
-      max-width: 860px;
-      margin: 0 auto;
-    }
+    .container { max-width: 860px; margin: 0 auto; }
 
-    header {
-      text-align: center;
-      margin-bottom: 32px;
-    }
-
-    header h1 {
-      font-size: 28px;
-      font-weight: 700;
-      color: #1a1a2e;
-    }
-
-    header p {
-      margin-top: 8px;
-      color: #666;
-      font-size: 14px;
-    }
+    header { text-align: center; margin-bottom: 32px; }
+    header h1 { font-size: 28px; font-weight: 700; color: #1a1a2e; }
+    header p { margin-top: 8px; color: #666; font-size: 14px; }
 
     .card {
       background: #fff;
@@ -45,53 +29,19 @@
     }
 
     .card h2 {
-      font-size: 16px;
-      font-weight: 600;
-      color: #333;
-      margin-bottom: 18px;
-      padding-bottom: 10px;
+      font-size: 16px; font-weight: 600; color: #333;
+      margin-bottom: 18px; padding-bottom: 10px;
       border-bottom: 2px solid #f0f2f5;
     }
 
-    .api-row {
-      display: flex;
-      gap: 10px;
-      align-items: center;
-    }
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
 
-    .api-row input {
-      flex: 1;
-    }
+    label { font-size: 13px; font-weight: 600; color: #444; }
+    label span { font-weight: 400; color: #999; font-size: 12px; }
 
-    .form-grid {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-    }
-
-    .form-group {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .form-group.full {
-      grid-column: 1 / -1;
-    }
-
-    label {
-      font-size: 13px;
-      font-weight: 600;
-      color: #444;
-    }
-
-    label span {
-      font-weight: 400;
-      color: #999;
-      font-size: 12px;
-    }
-
-    input, textarea {
+    input, textarea, select {
       border: 1.5px solid #e0e0e0;
       border-radius: 8px;
       padding: 10px 12px;
@@ -103,66 +53,91 @@
       background: #fafafa;
     }
 
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
       border-color: #4f46e5;
       background: #fff;
     }
 
-    textarea {
-      resize: vertical;
-      min-height: 80px;
-    }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .api-row { display: flex; gap: 10px; align-items: center; }
+    .api-row input { flex: 1; }
 
     .btn {
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      padding: 12px 24px;
-      border-radius: 10px;
-      font-size: 15px;
-      font-weight: 600;
-      cursor: pointer;
-      border: none;
-      transition: all 0.2s;
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 12px 24px; border-radius: 10px;
+      font-size: 15px; font-weight: 600;
+      cursor: pointer; border: none; transition: all 0.2s;
     }
 
-    .btn-primary {
-      background: #4f46e5;
-      color: #fff;
-      width: 100%;
-      justify-content: center;
-      font-size: 16px;
-      padding: 14px;
-    }
-
-    .btn-primary:hover { background: #4338ca; }
-    .btn-primary:disabled { background: #a5b4fc; cursor: not-allowed; }
-
-    .btn-copy {
-      background: #f0f2f5;
-      color: #444;
-      font-size: 14px;
-      padding: 8px 16px;
-    }
-
-    .btn-copy:hover { background: #e2e8f0; }
     .btn-save {
-      background: #ecfdf5;
-      color: #065f46;
-      font-size: 13px;
-      padding: 8px 14px;
+      background: #ecfdf5; color: #065f46;
+      font-size: 13px; padding: 8px 14px;
     }
     .btn-save:hover { background: #d1fae5; }
 
-    .output-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 14px;
-      padding-bottom: 10px;
-      border-bottom: 2px solid #f0f2f5;
+    /* 메인 자동 생성 버튼 */
+    .btn-auto {
+      background: linear-gradient(135deg, #1877f2 0%, #4f46e5 100%);
+      color: #fff; width: 100%; justify-content: center;
+      font-size: 18px; padding: 18px; border-radius: 14px;
+      box-shadow: 0 4px 16px rgba(79,70,229,0.3);
+      letter-spacing: -0.3px;
+    }
+    .btn-auto:hover { filter: brightness(1.08); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(79,70,229,0.4); }
+    .btn-auto:disabled { filter: none; transform: none; opacity: 0.6; cursor: not-allowed; box-shadow: none; }
+
+    .btn-copy {
+      background: #f0f2f5; color: #444;
+      font-size: 14px; padding: 8px 16px;
+    }
+    .btn-copy:hover { background: #e2e8f0; }
+
+    /* 진행 상태 표시 */
+    .progress-bar {
+      display: none;
+      margin: 20px 0 0;
+      background: #f0f2f5;
+      border-radius: 12px;
+      padding: 20px;
+    }
+    .progress-bar.visible { display: block; }
+
+    .step-list { display: flex; flex-direction: column; gap: 12px; }
+
+    .step {
+      display: flex; align-items: center; gap: 12px;
+      font-size: 14px; color: #999;
+    }
+    .step.active { color: #4f46e5; font-weight: 600; }
+    .step.done { color: #059669; }
+    .step.err { color: #dc2626; }
+
+    .step-icon {
+      width: 28px; height: 28px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; font-weight: 700; flex-shrink: 0;
+      background: #e5e7eb; color: #9ca3af;
+    }
+    .step.active .step-icon {
+      background: #e0e7ff; color: #4f46e5;
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+    .step.done .step-icon { background: #d1fae5; color: #059669; }
+    .step.err .step-icon { background: #fee2e2; color: #dc2626; }
+
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
     }
 
+    /* 출력 */
+    .output-header {
+      display: flex; align-items: center;
+      justify-content: space-between;
+      margin-bottom: 14px; padding-bottom: 10px;
+      border-bottom: 2px solid #f0f2f5;
+    }
     .output-header h2 { border: none; margin: 0; padding: 0; }
 
     #output-box {
@@ -171,79 +146,60 @@
       border-radius: 10px;
       padding: 20px;
       font-size: 14px;
-      line-height: 1.8;
+      line-height: 1.9;
       white-space: pre-wrap;
       color: #222;
       min-height: 120px;
       font-family: 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
     }
 
-    .loading {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      color: #6366f1;
-      font-size: 14px;
-      padding: 20px;
-      justify-content: center;
+    /* 데이터 미리보기 */
+    .data-preview {
+      display: none;
+      background: #f8faff;
+      border: 1.5px solid #c7d7fe;
+      border-radius: 10px;
+      padding: 16px 20px;
+      margin-top: 16px;
+      font-size: 13px;
+      line-height: 1.8;
+      color: #374151;
     }
+    .data-preview.visible { display: block; }
+    .data-preview strong { color: #4f46e5; }
 
-    .spinner {
-      width: 20px;
-      height: 20px;
-      border: 2px solid #e0e7ff;
-      border-top-color: #6366f1;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-    }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
+    .hint { font-size: 12px; color: #999; margin-top: 4px; }
 
     .toast {
-      position: fixed;
-      bottom: 24px;
-      left: 50%;
+      position: fixed; bottom: 24px; left: 50%;
       transform: translateX(-50%) translateY(20px);
-      background: #1a1a2e;
-      color: #fff;
-      padding: 10px 22px;
-      border-radius: 100px;
-      font-size: 14px;
-      opacity: 0;
-      transition: all 0.3s;
-      pointer-events: none;
-      z-index: 9999;
+      background: #1a1a2e; color: #fff;
+      padding: 10px 22px; border-radius: 100px;
+      font-size: 14px; opacity: 0;
+      transition: all 0.3s; pointer-events: none; z-index: 9999;
+    }
+    .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+    .section-divider {
+      text-align: center; font-size: 12px; color: #aaa;
+      margin: 8px 0; position: relative;
+    }
+    .section-divider::before {
+      content: ''; position: absolute;
+      top: 50%; left: 0; right: 0;
+      height: 1px; background: #e5e7eb; z-index: 0;
+    }
+    .section-divider span {
+      background: #fff; padding: 0 10px; position: relative; z-index: 1;
     }
 
-    .toast.show {
-      opacity: 1;
-      transform: translateX(-50%) translateY(0);
+    .tag {
+      display: inline-block;
+      background: #e0e7ff; color: #4f46e5;
+      font-size: 11px; font-weight: 700;
+      padding: 2px 8px; border-radius: 4px;
+      margin-left: 6px; vertical-align: middle;
     }
-
-    .hint {
-      font-size: 12px;
-      color: #999;
-      margin-top: 4px;
-    }
-    .btn-meta {
-      background: #1877f2;
-      color: #fff;
-      width: 100%;
-      justify-content: center;
-      font-size: 15px;
-      padding: 12px;
-      margin-bottom: 16px;
-    }
-    .btn-meta:hover { background: #1565d8; }
-    .btn-meta:disabled { background: #90b8f8; cursor: not-allowed; }
-    .fetch-status {
-      font-size: 13px;
-      color: #666;
-      margin-top: 10px;
-      min-height: 18px;
-    }
-    .fetch-status.ok { color: #059669; }
-    .fetch-status.err { color: #dc2626; }
   </style>
 </head>
 <body>
@@ -251,30 +207,34 @@
 <div class="container">
   <header>
     <h1>🤖 김비서</h1>
-    <p>메타 광고 주간보고 자동 생성기 | 매주 월요일 카카오톡 보고용</p>
+    <p>메타 광고 주간보고 자동 생성기 | 데이터 자동 수집 → 보고서 생성 one-click</p>
   </header>
 
-  <!-- API Key -->
+  <!-- API 설정 -->
   <div class="card">
-    <h2>🔑 Claude API 키</h2>
-    <div class="api-row">
-      <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
-      <button class="btn btn-save" onclick="saveKey()">저장</button>
-    </div>
-    <p class="hint">API 키는 브라우저에만 저장됩니다. 외부로 전송되지 않습니다.</p>
-  </div>
-
-  <!-- Meta API 설정 -->
-  <div class="card">
-    <h2>📘 Meta 광고 계정 연결</h2>
+    <h2>🔑 API 설정</h2>
     <div class="form-grid">
-      <div class="form-group full">
+      <div class="form-group">
+        <label>Claude API 키</label>
+        <div class="api-row">
+          <input type="password" id="api-key" placeholder="sk-ant-api03-..." />
+          <button class="btn btn-save" onclick="saveSettings()">저장</button>
+        </div>
+      </div>
+      <div class="form-group">
         <label>Meta 액세스 토큰</label>
         <div class="api-row">
           <input type="password" id="meta-token" placeholder="EAAg..." />
-          <button class="btn btn-save" onclick="saveMetaToken()">저장</button>
         </div>
       </div>
+    </div>
+    <p class="hint" style="margin-top:10px;">🔒 모든 키는 브라우저 로컬에만 저장됩니다. 외부로 전송되지 않습니다.</p>
+  </div>
+
+  <!-- 광고 계정 설정 -->
+  <div class="card">
+    <h2>📘 광고 계정 <span class="tag">저장됨</span></h2>
+    <div class="form-grid">
       <div class="form-group">
         <label>광고 계정 ID</label>
         <input type="text" id="meta-account" placeholder="act_1585007079431077" />
@@ -283,82 +243,51 @@
         <label>브랜드명</label>
         <input type="text" id="meta-brand" placeholder="예: 온육집" />
       </div>
-    </div>
-    <button class="btn btn-meta" id="fetch-btn" onclick="fetchMetaData()" style="margin-top:16px;">
-      📊 Meta에서 전주 데이터 자동 가져오기
-    </button>
-    <div class="fetch-status" id="fetch-status"></div>
-  </div>
-
-  <!-- 입력 폼 -->
-  <div class="card">
-    <h2>📋 광고 데이터 입력 <span style="font-size:12px;color:#999;font-weight:400;">(자동 입력 또는 수동 수정)</span></h2>
-    <div class="form-grid">
-
       <div class="form-group">
-        <label>브랜드명</label>
-        <input type="text" id="brand" placeholder="예: 하이콴" />
-      </div>
-
-      <div class="form-group">
-        <label>보고 기간</label>
-        <input type="text" id="period" placeholder="예: 3/16~3/22" />
-      </div>
-
-      <div class="form-group">
-        <label>DB <span>(전환 건수)</span></label>
-        <input type="number" id="db" placeholder="예: 11" />
-      </div>
-
-      <div class="form-group">
-        <label>지출 비용 <span>(원)</span></label>
-        <input type="number" id="spend" placeholder="예: 690804" />
-      </div>
-
-      <div class="form-group">
-        <label>이번 주 CPA <span>(원)</span></label>
-        <input type="number" id="cpa-this" placeholder="예: 62800" />
-      </div>
-
-      <div class="form-group">
-        <label>전주 CPA <span>(원, 비교용)</span></label>
+        <label>전주 CPA <span>(없으면 0 입력)</span></label>
         <input type="number" id="cpa-last" placeholder="예: 85407" />
       </div>
-
       <div class="form-group">
-        <label>CTR <span>(%)</span></label>
-        <input type="text" id="ctr" placeholder="예: 2.27" />
-      </div>
-
-      <div class="form-group">
-        <label>베스트 소재명</label>
-        <input type="text" id="best-creative" placeholder="예: [인터뷰] 정이랑 배우 영상" />
-      </div>
-
-      <div class="form-group full">
-        <label>소재 메인 카피 <span>(있을 경우)</span></label>
-        <input type="text" id="copy" placeholder="예: '정이랑이 선택한 쌀국수'" />
-      </div>
-
-      <div class="form-group full">
         <label>특이사항 / 운영 메모 <span>(선택)</span></label>
-        <textarea id="notes" placeholder="예: 신규 대표님 인터뷰 소재 투입, CPC 편차 발생 중, 특정 소구점 반응 좋음 등"></textarea>
+        <input type="text" id="notes" placeholder="예: 신규 소재 투입, CPC 편차 발생 등" />
       </div>
-
     </div>
+    <button class="btn btn-save" onclick="saveSettings()" style="margin-top:14px;">💾 설정 저장</button>
   </div>
 
-  <button class="btn btn-primary" id="gen-btn" onclick="generate()">
-    ✍️ 보고서 생성
+  <!-- 메인 버튼 -->
+  <button class="btn btn-auto" id="main-btn" onclick="runAll()">
+    🚀 전주 데이터 가져오고 보고서 자동 생성
   </button>
 
+  <!-- 진행 상태 -->
+  <div class="progress-bar" id="progress-bar">
+    <div class="step-list">
+      <div class="step" id="step-1">
+        <div class="step-icon">1</div>
+        <span>Meta API에서 전주 광고 데이터 수집 중...</span>
+      </div>
+      <div class="step" id="step-2">
+        <div class="step-icon">2</div>
+        <span>베스트 소재 분석 중...</span>
+      </div>
+      <div class="step" id="step-3">
+        <div class="step-icon">3</div>
+        <span>김비서가 보고서 작성 중...</span>
+      </div>
+    </div>
+
+    <!-- 수집된 데이터 미리보기 -->
+    <div class="data-preview" id="data-preview"></div>
+  </div>
+
   <!-- 출력 -->
-  <div class="card" style="margin-top: 20px;" id="output-card">
+  <div class="card" style="margin-top: 20px;">
     <div class="output-header">
       <h2>📨 생성된 보고서</h2>
       <button class="btn btn-copy" onclick="copyOutput()">📋 복사</button>
     </div>
-    <div id="output-box">여기에 생성된 보고서가 출력됩니다.</div>
+    <div id="output-box">버튼을 누르면 Meta 데이터를 자동으로 가져와 보고서를 작성합니다.</div>
   </div>
 </div>
 
@@ -387,7 +316,7 @@
 
 🔥 베스트 소재
 소재 : {소재명}
-메인 카피 : "{카피}" (카피가 있을 경우)
+메인 카피 : "{카피}" (카피가 있을 경우에만)
 > {소재 효과 해석 - 예비창업자 심리와 연결}
 
 🚀 향후 운영 방향
@@ -400,44 +329,40 @@
 - 이모지는 섹션 헤더에만 사용
 - 광고 성과를 예비창업자 관점에서 해석 (심리적 장벽, 신뢰도, 운영 편의성)
 - 숫자는 천 단위 콤마 포함하여 표기 (예: 690,804원)
+- 전주 CPA가 0이면 "전주 데이터 없음"으로 표기
 - CPA 전주 대비 개선 시 → 소재 효율 강조 / 상승 시 → 신규 소재 학습 기간 또는 테스트 성과로 해석
 - 인사이트는 현상 + 해석 구조로 2~3문장 이내
 - 마크다운 없이 순수 텍스트로만 출력 (**, ## 등 사용 금지)`;
 
-  // 저장된 키 불러오기
+  // ── 저장된 설정 불러오기 ──
   window.onload = () => {
-    const claude = localStorage.getItem('claude_api_key');
-    if (claude) document.getElementById('api-key').value = claude;
-    const metaToken = localStorage.getItem('meta_token');
-    if (metaToken) document.getElementById('meta-token').value = metaToken;
-    const metaAccount = localStorage.getItem('meta_account');
-    if (metaAccount) document.getElementById('meta-account').value = metaAccount;
-    const metaBrand = localStorage.getItem('meta_brand');
-    if (metaBrand) document.getElementById('meta-brand').value = metaBrand;
+    const fields = ['api-key', 'meta-token', 'meta-account', 'meta-brand', 'cpa-last', 'notes'];
+    fields.forEach(id => {
+      const val = localStorage.getItem('kimbi_' + id);
+      if (val) document.getElementById(id).value = val;
+    });
+
+    // 계정 ID 저장 여부에 따라 tag 업데이트
+    const saved = localStorage.getItem('kimbi_meta-account');
+    if (saved) {
+      document.querySelector('.tag').textContent = '저장됨 ✓';
+    }
   };
 
-  function saveKey() {
-    const key = document.getElementById('api-key').value.trim();
-    if (key) {
-      localStorage.setItem('claude_api_key', key);
-      showToast('API 키가 저장되었습니다.');
-    }
-  }
-
-  function saveMetaToken() {
-    const token = document.getElementById('meta-token').value.trim();
-    const account = document.getElementById('meta-account').value.trim();
-    const brand = document.getElementById('meta-brand').value.trim();
-    if (token) localStorage.setItem('meta_token', token);
-    if (account) localStorage.setItem('meta_account', account);
-    if (brand) localStorage.setItem('meta_brand', brand);
-    showToast('Meta 설정이 저장되었습니다.');
+  function saveSettings() {
+    const fields = ['api-key', 'meta-token', 'meta-account', 'meta-brand', 'cpa-last', 'notes'];
+    fields.forEach(id => {
+      const val = document.getElementById(id).value.trim();
+      if (val) localStorage.setItem('kimbi_' + id, val);
+    });
+    document.querySelector('.tag').textContent = '저장됨 ✓';
+    showToast('✅ 설정이 저장되었습니다.');
   }
 
   // ── 날짜 계산 (전주 월~일) ──
   function getLastWeekRange() {
     const today = new Date();
-    const dayOfWeek = today.getDay(); // 0=일, 1=월
+    const dayOfWeek = today.getDay();
     const daysBack = dayOfWeek === 0 ? 6 : dayOfWeek - 1;
     const thisMonday = new Date(today);
     thisMonday.setDate(today.getDate() - daysBack);
@@ -458,124 +383,138 @@
     };
   }
 
-  // ── Meta API 데이터 가져오기 ──
-  async function fetchMetaData() {
+  function setStep(n, state) {
+    const el = document.getElementById('step-' + n);
+    el.className = 'step ' + state;
+    const icons = { active: '⟳', done: '✓', err: '✕' };
+    el.querySelector('.step-icon').textContent = icons[state] || n;
+  }
+
+  // ── 전환(리드) 건수 추출 ──
+  function getLeads(d) {
+    const acts = d?.actions || [];
+    const leadTypes = ['lead', 'offsite_conversion.fb_pixel_lead', 'onsite_conversion.lead_grouped'];
+    return acts.filter(a => leadTypes.includes(a.action_type)).reduce((s, a) => s + Number(a.value), 0);
+  }
+
+  // ── 메인: Meta 데이터 가져오기 + 보고서 생성 ──
+  async function runAll() {
+    const apiKey  = document.getElementById('api-key').value.trim();
     const token   = document.getElementById('meta-token').value.trim();
     const account = document.getElementById('meta-account').value.trim();
     const brand   = document.getElementById('meta-brand').value.trim();
-    const status  = document.getElementById('fetch-status');
+    const cpaLast = document.getElementById('cpa-last').value.trim();
+    const notes   = document.getElementById('notes').value.trim();
 
-    if (!token || !account) {
-      status.textContent = '⚠️ 토큰과 광고 계정 ID를 입력해주세요.';
-      status.className = 'fetch-status err';
-      return;
-    }
+    if (!apiKey) { showToast('Claude API 키를 입력해주세요.'); return; }
+    if (!token)  { showToast('Meta 액세스 토큰을 입력해주세요.'); return; }
+    if (!account){ showToast('광고 계정 ID를 입력해주세요.'); return; }
+    if (!brand)  { showToast('브랜드명을 입력해주세요.'); return; }
 
-    const btn = document.getElementById('fetch-btn');
+    const btn = document.getElementById('main-btn');
+    const box = document.getElementById('output-box');
+    const progress = document.getElementById('progress-bar');
+    const preview = document.getElementById('data-preview');
+
     btn.disabled = true;
-    btn.textContent = '데이터 불러오는 중...';
-    status.textContent = '';
-    status.className = 'fetch-status';
+    btn.textContent = '처리 중...';
+    progress.classList.add('visible');
+    preview.classList.remove('visible');
+    box.textContent = '처리 중입니다...';
+
+    // step 초기화
+    [1,2,3].forEach(n => {
+      const el = document.getElementById('step-' + n);
+      el.className = 'step';
+      el.querySelector('.step-icon').textContent = n;
+    });
 
     try {
+      // ── STEP 1: 계정 레벨 인사이트 ──
+      setStep(1, 'active');
       const { since, until, prevSince, prevUntil, label } = getLastWeekRange();
       const BASE = 'https://graph.facebook.com/v19.0';
-      const fields = 'spend,actions,ctr,clicks,impressions';
+      const fields = 'spend,actions,ctr,clicks,impressions,cpc';
 
-      // 이번 주 계정 레벨 인사이트
-      const [thisWeek, prevWeek, adsData] = await Promise.all([
+      const [thisWeek, prevWeek] = await Promise.all([
         fetch(`${BASE}/${account}/insights?fields=${fields}&time_range={"since":"${since}","until":"${until}"}&access_token=${token}`).then(r => r.json()),
         fetch(`${BASE}/${account}/insights?fields=${fields}&time_range={"since":"${prevSince}","until":"${prevUntil}"}&access_token=${token}`).then(r => r.json()),
-        fetch(`${BASE}/${account}/insights?fields=ad_name,spend,actions,ctr&level=ad&time_range={"since":"${since}","until":"${until}"}&sort=["spend_descending"]&limit=5&access_token=${token}`).then(r => r.json()),
       ]);
 
-      if (thisWeek.error) throw new Error(thisWeek.error.message);
+      if (thisWeek.error) throw new Error('Meta API 오류: ' + thisWeek.error.message);
 
       const w = thisWeek.data?.[0] || {};
       const p = prevWeek.data?.[0] || {};
-
-      // 전환(리드) 건수 추출
-      const getLeads = (d) => {
-        const acts = d?.actions || [];
-        const leadTypes = ['lead','offsite_conversion.fb_pixel_lead','onsite_conversion.lead_grouped'];
-        return acts.filter(a => leadTypes.includes(a.action_type)).reduce((s, a) => s + Number(a.value), 0);
-      };
 
       const db       = getLeads(w);
       const spend    = Math.round(Number(w.spend || 0));
       const cpa      = db > 0 ? Math.round(spend / db) : 0;
       const ctr      = Number(w.ctr || 0).toFixed(2);
+      const cpc      = Math.round(Number(w.cpc || 0));
       const prevDb   = getLeads(p);
       const prevSpend = Math.round(Number(p.spend || 0));
-      const prevCpa  = prevDb > 0 ? Math.round(prevSpend / prevDb) : 0;
+      // 전주 CPA: 직접 입력값 우선, 없으면 API에서 계산
+      const prevCpa = cpaLast ? Number(cpaLast) : (prevDb > 0 ? Math.round(prevSpend / prevDb) : 0);
 
-      // 베스트 소재 (전환 가장 많은 광고)
-      const ads = adsData.data || [];
-      const bestAd = ads.sort((a, b) => getLeads(b) - getLeads(a))[0];
-      const bestName = bestAd?.ad_name || '';
+      setStep(1, 'done');
 
-      // 폼에 자동 입력
-      document.getElementById('brand').value    = brand || '온육집';
-      document.getElementById('period').value   = label;
-      document.getElementById('db').value       = db;
-      document.getElementById('spend').value    = spend;
-      document.getElementById('cpa-this').value = cpa;
-      document.getElementById('cpa-last').value = prevCpa;
-      document.getElementById('ctr').value      = ctr;
-      document.getElementById('best-creative').value = bestName;
+      // ── STEP 2: 광고 레벨 인사이트 (베스트 소재) ──
+      setStep(2, 'active');
 
-      status.textContent = `✅ 데이터 불러오기 완료! (${label} 기준)`;
-      status.className = 'fetch-status ok';
+      const adsRes = await fetch(
+        `${BASE}/${account}/insights?fields=ad_name,adset_name,spend,actions,ctr,cpc&level=ad&time_range={"since":"${since}","until":"${until}"}&sort=["spend_descending"]&limit=10&access_token=${token}`
+      ).then(r => r.json());
 
-    } catch (e) {
-      status.textContent = '❌ 오류: ' + e.message;
-      status.className = 'fetch-status err';
-    } finally {
-      btn.disabled = false;
-      btn.textContent = '📊 Meta에서 전주 데이터 자동 가져오기';
-    }
-  }
+      let bestAdName = '';
+      let bestAdLeads = 0;
+      let adInsights = [];
 
-  async function generate() {
-    const apiKey = document.getElementById('api-key').value.trim();
-    if (!apiKey) { showToast('API 키를 입력해주세요.'); return; }
+      if (!adsRes.error && adsRes.data?.length > 0) {
+        const sortedAds = adsRes.data.sort((a, b) => getLeads(b) - getLeads(a));
+        const best = sortedAds[0];
+        bestAdName  = best.ad_name || '';
+        bestAdLeads = getLeads(best);
 
-    const brand       = document.getElementById('brand').value.trim();
-    const period      = document.getElementById('period').value.trim();
-    const db          = document.getElementById('db').value.trim();
-    const spend       = document.getElementById('spend').value.trim();
-    const cpaThis     = document.getElementById('cpa-this').value.trim();
-    const cpaLast     = document.getElementById('cpa-last').value.trim();
-    const ctr         = document.getElementById('ctr').value.trim();
-    const bestCreative = document.getElementById('best-creative').value.trim();
-    const copy        = document.getElementById('copy').value.trim();
-    const notes       = document.getElementById('notes').value.trim();
+        // 상위 3개 소재 인사이트
+        adInsights = sortedAds.slice(0, 3).map(ad => ({
+          name: ad.ad_name,
+          leads: getLeads(ad),
+          spend: Math.round(Number(ad.spend || 0)),
+          ctr: Number(ad.ctr || 0).toFixed(2),
+          cpc: Math.round(Number(ad.cpc || 0)),
+        }));
+      }
 
-    if (!brand || !period || !db || !spend || !cpaThis || !cpaLast || !ctr) {
-      showToast('필수 항목을 모두 입력해주세요.'); return;
-    }
+      setStep(2, 'done');
 
-    const userMessage = `김비서, 이번 주 보고서 작성해줘.
+      // 데이터 미리보기 표시
+      preview.innerHTML = `<strong>📊 수집된 데이터 (${label})</strong><br>
+지출: ${spend.toLocaleString()}원 | DB: ${db}건 | CPA: ${cpa.toLocaleString()}원 | CTR: ${ctr}% | CPC: ${cpc.toLocaleString()}원<br>
+베스트 소재: ${bestAdName || '없음'} (DB ${bestAdLeads}건)`;
+      preview.classList.add('visible');
+
+      // ── STEP 3: Claude 보고서 생성 ──
+      setStep(3, 'active');
+
+      const adInsightText = adInsights.length > 0
+        ? `\n\n상위 소재 데이터:\n` + adInsights.map((a, i) =>
+            `${i+1}. ${a.name} - DB ${a.leads}건, 지출 ${a.spend.toLocaleString()}원, CTR ${a.ctr}%, CPC ${a.cpc.toLocaleString()}원`
+          ).join('\n')
+        : '';
+
+      const userMessage = `김비서, 이번 주 보고서 작성해줘.
 
 브랜드: ${brand}
-기간: ${period}
+기간: ${label}
 DB: ${db}건
-지출: ${Number(spend).toLocaleString()}원
-이번주 CPA: ${Number(cpaThis).toLocaleString()}원
-전주 CPA: ${Number(cpaLast).toLocaleString()}원
+지출: ${spend.toLocaleString()}원
+이번주 CPA: ${cpa.toLocaleString()}원
+전주 CPA: ${prevCpa > 0 ? prevCpa.toLocaleString() + '원' : '없음 (첫 주)'}
 CTR: ${ctr}%
-베스트 소재: ${bestCreative || '없음'}
-메인 카피: ${copy || '없음'}
-특이사항: ${notes || '없음'}`;
+CPC: ${cpc.toLocaleString()}원
+베스트 소재: ${bestAdName || '데이터 없음'}
+특이사항: ${notes || '없음'}${adInsightText}`;
 
-    const btn = document.getElementById('gen-btn');
-    const box = document.getElementById('output-box');
-
-    btn.disabled = true;
-    btn.textContent = '생성 중...';
-    box.innerHTML = '<div class="loading"><div class="spinner"></div>김비서가 보고서를 작성하고 있습니다...</div>';
-
-    try {
       const res = await fetch('https://api.anthropic.com/v1/messages', {
         method: 'POST',
         headers: {
@@ -594,26 +533,36 @@ CTR: ${ctr}%
 
       if (!res.ok) {
         const err = await res.json();
-        throw new Error(err.error?.message || `HTTP ${res.status}`);
+        throw new Error('Claude API 오류: ' + (err.error?.message || `HTTP ${res.status}`));
       }
 
       const data = await res.json();
       const text = data.content?.[0]?.text || '응답을 받지 못했습니다.';
+
+      setStep(3, 'done');
       box.textContent = text;
 
     } catch (e) {
-      box.textContent = '오류가 발생했습니다: ' + e.message;
+      // 어떤 step에서 실패했는지 표시
+      [1,2,3].forEach(n => {
+        if (document.getElementById('step-' + n).className.includes('active')) {
+          setStep(n, 'err');
+        }
+      });
+      box.textContent = '❌ 오류가 발생했습니다:\n' + e.message;
     } finally {
       btn.disabled = false;
-      btn.textContent = '✍️ 보고서 생성';
+      btn.textContent = '🚀 전주 데이터 가져오고 보고서 자동 생성';
     }
   }
 
   function copyOutput() {
     const text = document.getElementById('output-box').textContent;
-    navigator.clipboard.writeText(text).then(() => {
-      showToast('클립보드에 복사되었습니다!');
-    });
+    if (text.startsWith('버튼을') || text.startsWith('처리') || text.startsWith('❌')) {
+      showToast('복사할 보고서가 없습니다.');
+      return;
+    }
+    navigator.clipboard.writeText(text).then(() => showToast('📋 클립보드에 복사되었습니다!'));
   }
 
   function showToast(msg) {
