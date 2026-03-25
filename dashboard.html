@@ -1,0 +1,1099 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>업무 대시보드</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #21262d;
+    --border: #30363d;
+    --text: #e6edf3;
+    --text-muted: #8b949e;
+    --accent: #58a6ff;
+    --accent2: #3fb950;
+    --accent3: #f78166;
+    --accent4: #d2a8ff;
+    --accent5: #ffa657;
+    --radius: 12px;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Pretendard', 'Apple SD Gothic Neo', 'Malgun Gothic', sans-serif;
+    min-height: 100vh;
+  }
+
+  /* ── HEADER ── */
+  header {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 28px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .logo { font-size: 20px; font-weight: 700; color: var(--accent); letter-spacing: -0.5px; }
+  .header-right { display: flex; align-items: center; gap: 16px; }
+  .today-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+  }
+  .today-badge span { color: var(--accent); font-weight: 600; }
+  .time-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--text);
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.5px;
+  }
+  .weather-badge {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 5px 14px;
+    font-size: 13px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .weather-badge .w-icon { font-size: 18px; }
+  .weather-badge .w-temp { color: var(--text); font-weight: 700; }
+  .weather-badge .w-desc { color: var(--text-muted); }
+
+  /* ── LAYOUT ── */
+  .container { max-width: 1400px; margin: 0 auto; padding: 24px 28px; }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 20px;
+  }
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 20px;
+  }
+  .card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 18px;
+  }
+  .card-title {
+    font-size: 15px;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title .icon { font-size: 18px; }
+
+  /* ── SUMMARY CARDS ── */
+  .summary-row {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-bottom: 20px;
+  }
+  .summary-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  .summary-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 4px; height: 100%;
+  }
+  .summary-card.blue::before { background: var(--accent); }
+  .summary-card.green::before { background: var(--accent2); }
+  .summary-card.orange::before { background: var(--accent5); }
+  .summary-card.purple::before { background: var(--accent4); }
+  .summary-label { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+  .summary-value { font-size: 24px; font-weight: 700; }
+  .summary-card.blue .summary-value { color: var(--accent); }
+  .summary-card.green .summary-value { color: var(--accent2); }
+  .summary-card.orange .summary-value { color: var(--accent5); }
+  .summary-card.purple .summary-value { color: var(--accent4); }
+  .summary-sub { font-size: 12px; color: var(--text-muted); margin-top: 4px; }
+
+  /* ── TODO ── */
+  .span-1 { grid-column: span 1; }
+  .span-2 { grid-column: span 2; }
+
+  .todo-add {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .todo-add input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 14px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .todo-add input:focus { border-color: var(--accent); }
+  .todo-add select {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 9px 10px;
+    color: var(--text);
+    font-size: 12px;
+    outline: none;
+    cursor: pointer;
+  }
+  .btn-add {
+    background: var(--accent);
+    color: #0d1117;
+    border: none;
+    border-radius: 8px;
+    padding: 9px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: opacity 0.2s;
+    white-space: nowrap;
+  }
+  .btn-add:hover { opacity: 0.85; }
+
+  .todo-list { display: flex; flex-direction: column; gap: 8px; max-height: 380px; overflow-y: auto; }
+  .todo-list::-webkit-scrollbar { width: 4px; }
+  .todo-list::-webkit-scrollbar-track { background: transparent; }
+  .todo-list::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .todo-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+    transition: border-color 0.2s;
+  }
+  .todo-item:hover { border-color: #444d56; }
+  .todo-item.done { opacity: 0.5; }
+  .todo-item.done .todo-text { text-decoration: line-through; color: var(--text-muted); }
+
+  .todo-check {
+    width: 18px; height: 18px;
+    accent-color: var(--accent2);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+  .todo-text { flex: 1; font-size: 13.5px; }
+  .priority-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 20px;
+    flex-shrink: 0;
+  }
+  .priority-badge.high { background: #f7816620; color: var(--accent3); border: 1px solid #f7816640; }
+  .priority-badge.mid  { background: #ffa65720; color: var(--accent5); border: 1px solid #ffa65740; }
+  .priority-badge.low  { background: #3fb95020; color: var(--accent2); border: 1px solid #3fb95040; }
+  .todo-assignee { font-size: 11px; color: var(--text-muted); flex-shrink: 0; }
+  .todo-delete {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    cursor: pointer;
+    font-size: 16px;
+    line-height: 1;
+    padding: 0 2px;
+    opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .todo-item:hover .todo-delete { opacity: 1; }
+  .todo-delete:hover { color: var(--accent3); }
+
+  /* ── PROGRESS ── */
+  .project-list { display: flex; flex-direction: column; gap: 16px; }
+  .project-item {}
+  .project-meta {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 6px;
+    font-size: 13px;
+  }
+  .project-name { font-weight: 600; }
+  .project-pct { font-weight: 700; color: var(--accent); }
+  .progress-bar-bg {
+    height: 8px;
+    background: var(--surface2);
+    border-radius: 20px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .progress-bar-fill {
+    height: 100%;
+    border-radius: 20px;
+    transition: width 0.6s ease;
+  }
+  .project-sub { font-size: 11px; color: var(--text-muted); }
+
+  /* ── SCHEDULE ── */
+  .week-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px;
+  }
+  .day-col {}
+  .day-header {
+    text-align: center;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+  }
+  .day-header.today { color: var(--accent); }
+  .day-events { display: flex; flex-direction: column; gap: 6px; }
+  .event-pill {
+    background: var(--surface2);
+    border-left: 3px solid var(--accent);
+    border-radius: 4px;
+    padding: 6px 8px;
+    font-size: 11.5px;
+    line-height: 1.4;
+  }
+  .event-pill.green { border-left-color: var(--accent2); }
+  .event-pill.orange { border-left-color: var(--accent5); }
+  .event-pill.purple { border-left-color: var(--accent4); }
+  .event-pill.red { border-left-color: var(--accent3); }
+  .event-time { font-size: 10px; color: var(--text-muted); }
+
+  /* ── CHART ── */
+  .chart-wrap { position: relative; height: 220px; }
+
+  /* ── SALES TABLE ── */
+  .sales-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .sales-table th {
+    text-align: left;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 0 10px 10px;
+    border-bottom: 1px solid var(--border);
+  }
+  .sales-table td {
+    padding: 10px;
+    border-bottom: 1px solid #21262d;
+  }
+  .sales-table tr:last-child td { border-bottom: none; }
+  .sales-table tr:hover td { background: var(--surface2); }
+  .amount { font-weight: 600; color: var(--accent2); text-align: right; }
+  .region-badge {
+    display: inline-block;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    color: var(--text-muted);
+  }
+
+  /* ── 김비서 모달 ── */
+  .secretary-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: #00000080;
+    z-index: 999;
+    backdrop-filter: blur(4px);
+    align-items: flex-end;
+    justify-content: flex-end;
+    padding: 24px;
+  }
+  .secretary-overlay.open { display: flex; }
+
+  .secretary-panel {
+    background: var(--surface);
+    border: 1px solid #58a6ff60;
+    border-radius: 16px;
+    width: 420px;
+    max-height: 600px;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 24px 60px #00000080, 0 0 0 1px #58a6ff20;
+    animation: slideUp 0.25s ease;
+  }
+  @keyframes slideUp {
+    from { transform: translateY(20px); opacity: 0; }
+    to   { transform: translateY(0);    opacity: 1; }
+  }
+
+  .secretary-header {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 16px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+  .secretary-avatar {
+    width: 36px; height: 36px;
+    background: linear-gradient(135deg, #58a6ff, #a371f7);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+  }
+  .secretary-name { font-weight: 700; font-size: 15px; }
+  .secretary-status { font-size: 11px; color: var(--accent2); }
+  .secretary-close {
+    margin-left: auto;
+    background: none; border: none;
+    color: var(--text-muted); font-size: 20px;
+    cursor: pointer; line-height: 1;
+    padding: 4px;
+    border-radius: 6px;
+    transition: background 0.15s;
+  }
+  .secretary-close:hover { background: var(--surface2); color: var(--text); }
+
+  .secretary-chat {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    min-height: 280px;
+    max-height: 400px;
+  }
+  .secretary-chat::-webkit-scrollbar { width: 4px; }
+  .secretary-chat::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+  .chat-bubble {
+    max-width: 88%;
+    padding: 10px 14px;
+    border-radius: 12px;
+    font-size: 13px;
+    line-height: 1.55;
+  }
+  .chat-bubble.bot {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .chat-bubble.user {
+    background: linear-gradient(135deg, #1a3a5c, #1e2a4a);
+    border: 1px solid #58a6ff40;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    color: #c9d8eb;
+  }
+  .chat-bubble b { color: var(--accent); }
+  .chat-bubble .ok { color: var(--accent2); font-weight: 600; }
+  .chat-bubble .err { color: var(--accent3); }
+
+  .secretary-hint {
+    padding: 8px 16px;
+    font-size: 11px;
+    color: var(--text-muted);
+    border-top: 1px solid var(--border);
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .hint-chip {
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 3px 10px;
+    cursor: pointer;
+    transition: border-color 0.15s;
+    font-size: 11px;
+    white-space: nowrap;
+  }
+  .hint-chip:hover { border-color: var(--accent); color: var(--accent); }
+
+  .secretary-input-row {
+    display: flex;
+    gap: 8px;
+    padding: 12px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .secretary-input {
+    flex: 1;
+    background: var(--surface2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 10px 14px;
+    color: var(--text);
+    font-size: 13px;
+    outline: none;
+    transition: border-color 0.2s;
+    font-family: inherit;
+  }
+  .secretary-input:focus { border-color: var(--accent); }
+  .secretary-send {
+    background: linear-gradient(135deg, #58a6ff, #a371f7);
+    border: none;
+    border-radius: 10px;
+    width: 38px; height: 38px;
+    cursor: pointer;
+    font-size: 16px;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity 0.2s;
+    flex-shrink: 0;
+  }
+  .secretary-send:hover { opacity: 0.85; }
+
+  /* 입력창 힌트 효과 */
+  #todo-input.slash-mode {
+    border-color: #a371f7;
+    background: #1a1030;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">📊 업무 대시보드</div>
+  <div class="header-right">
+    <div class="weather-badge" id="weather-badge">
+      <span class="w-icon" id="w-icon">🌤️</span>
+      <span class="w-temp" id="w-temp">--°</span>
+      <span class="w-desc" id="w-desc">날씨 불러오는 중</span>
+    </div>
+    <div class="time-badge" id="live-time">--:--:--</div>
+    <div class="today-badge" id="today-label">오늘: <span id="today-str">--</span></div>
+  </div>
+</header>
+
+<div class="container">
+
+  <!-- ── 요약 카드 ── -->
+  <div class="summary-row">
+    <div class="summary-card blue">
+      <div class="summary-label">오늘 할 일</div>
+      <div class="summary-value" id="stat-total">-</div>
+      <div class="summary-sub" id="stat-done">완료 - / 미완료 -</div>
+    </div>
+    <div class="summary-card green">
+      <div class="summary-label">이번주 매출 합계</div>
+      <div class="summary-value">4,280만원</div>
+      <div class="summary-sub">2월 누계 기준</div>
+    </div>
+    <div class="summary-card orange">
+      <div class="summary-label">최고 매출 제품</div>
+      <div class="summary-value" style="font-size:18px;">무선 이어폰</div>
+      <div class="summary-sub">전체 매출의 약 38%</div>
+    </div>
+    <div class="summary-card purple">
+      <div class="summary-label">진행 중 프로젝트</div>
+      <div class="summary-value">4</div>
+      <div class="summary-sub">이번 주 마감 2건</div>
+    </div>
+  </div>
+
+  <!-- ── 메인 그리드 ── -->
+  <div class="grid">
+
+    <!-- 오늘 할 일 -->
+    <div class="card span-1">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">✅</span> 오늘 할 일</div>
+      </div>
+      <div class="todo-add">
+        <input type="text" id="todo-input" placeholder="새 할 일 입력..." />
+        <select id="todo-priority">
+          <option value="high">🔴 높음</option>
+          <option value="mid" selected>🟡 보통</option>
+          <option value="low">🟢 낮음</option>
+        </select>
+        <button class="btn-add" onclick="addTodo()">+ 추가</button>
+      </div>
+      <div class="todo-list" id="todo-list"></div>
+    </div>
+
+    <!-- 프로젝트 진행률 -->
+    <div class="card span-1">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">🚀</span> 프로젝트 진행률</div>
+      </div>
+      <div class="project-list" id="project-list"></div>
+    </div>
+
+    <!-- 매출 차트 -->
+    <div class="card span-1">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">💰</span> 제품별 매출 현황</div>
+      </div>
+      <div class="chart-wrap">
+        <canvas id="salesChart"></canvas>
+      </div>
+    </div>
+
+    <!-- 이번 주 일정 -->
+    <div class="card span-2">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📅</span> 이번 주 일정 (3/11 ~ 3/15)</div>
+      </div>
+      <div class="week-grid">
+        <div class="day-col">
+          <div class="day-header today">월 3/11</div>
+          <div class="day-events">
+            <div class="event-pill orange">
+              <div>주간 업무 회의</div>
+              <div class="event-time">오전 10:00</div>
+            </div>
+            <div class="event-pill">
+              <div>영상 광고 기획 착수</div>
+              <div class="event-time">박사원</div>
+            </div>
+          </div>
+        </div>
+        <div class="day-col">
+          <div class="day-header">화 3/12</div>
+          <div class="day-events">
+            <div class="event-pill green">
+              <div>SNS 콘텐츠 업로드</div>
+              <div class="event-time">오전 11:00</div>
+            </div>
+            <div class="event-pill purple">
+              <div>경쟁사 캠페인 분석</div>
+              <div class="event-time">박사원</div>
+            </div>
+          </div>
+        </div>
+        <div class="day-col">
+          <div class="day-header">수 3/13</div>
+          <div class="day-events">
+            <div class="event-pill red">
+              <div>3월 프로모션 기획안 제출 ⚡</div>
+              <div class="event-time">마감 · 김대리</div>
+            </div>
+            <div class="event-pill">
+              <div>영상 광고 1차 편집</div>
+              <div class="event-time">박사원</div>
+            </div>
+          </div>
+        </div>
+        <div class="day-col">
+          <div class="day-header">목 3/14</div>
+          <div class="day-events">
+            <div class="event-pill purple">
+              <div>인플루언서 미팅 협의</div>
+              <div class="event-time">이과장</div>
+            </div>
+            <div class="event-pill green">
+              <div>예산 추가 요청서 작성</div>
+              <div class="event-time">+200만원</div>
+            </div>
+          </div>
+        </div>
+        <div class="day-col">
+          <div class="day-header">금 3/15</div>
+          <div class="day-events">
+            <div class="event-pill red">
+              <div>인플루언서 미팅 확정 ⚡</div>
+              <div class="event-time">마감 · 이과장</div>
+            </div>
+            <div class="event-pill orange">
+              <div>주간 결과 리뷰</div>
+              <div class="event-time">오후 5:00</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 매출 상세 -->
+    <div class="card span-1">
+      <div class="card-header">
+        <div class="card-title"><span class="icon">📋</span> 최근 매출 내역</div>
+      </div>
+      <table class="sales-table">
+        <thead>
+          <tr>
+            <th>날짜</th>
+            <th>제품</th>
+            <th>지역</th>
+            <th style="text-align:right">매출액</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>02/10</td><td>무선 이어폰</td><td><span class="region-badge">대구</span></td><td class="amount">5,162,000</td></tr>
+          <tr><td>02/10</td><td>텀블러</td><td><span class="region-badge">서울</span></td><td class="amount">1,675,000</td></tr>
+          <tr><td>02/10</td><td>보조배터리</td><td><span class="region-badge">서울</span></td><td class="amount">1,365,000</td></tr>
+          <tr><td>02/05</td><td>블루투스 스피커</td><td><span class="region-badge">서울</span></td><td class="amount">3,000,000</td></tr>
+          <tr><td>02/05</td><td>에코백</td><td><span class="region-badge">대구</span></td><td class="amount">1,800,000</td></tr>
+          <tr><td>02/01</td><td>무선 이어폰</td><td><span class="region-badge">서울</span></td><td class="amount">6,230,000</td></tr>
+          <tr><td>02/01</td><td>텀블러</td><td><span class="region-badge">부산</span></td><td class="amount">2,375,000</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+  </div>
+</div>
+
+<!-- ── 김비서 모달 ── -->
+<div class="secretary-overlay" id="secretary-overlay" onclick="closeSecretary(event)">
+  <div class="secretary-panel" onclick="event.stopPropagation()">
+    <div class="secretary-header">
+      <div class="secretary-avatar">🤖</div>
+      <div>
+        <div class="secretary-name">김비서</div>
+        <div class="secretary-status">● 대기 중</div>
+      </div>
+      <button class="secretary-close" onclick="closeSecretary()">×</button>
+    </div>
+
+    <div class="secretary-chat" id="secretary-chat"></div>
+
+    <div class="secretary-hint">
+      <span style="color:var(--text-muted);font-size:11px;">빠른 명령:</span>
+      <span class="hint-chip" onclick="fillHint('할 일 추가: ')">+ 할 일 추가</span>
+      <span class="hint-chip" onclick="fillHint('매출 추가: ')">+ 매출 추가</span>
+      <span class="hint-chip" onclick="fillHint('완료: ')">✔ 완료 처리</span>
+      <span class="hint-chip" onclick="fillHint('삭제: ')">✕ 할 일 삭제</span>
+      <span class="hint-chip" onclick="fillHint('현황 알려줘')">📊 현황 요약</span>
+    </div>
+
+    <div class="secretary-input-row">
+      <input class="secretary-input" id="secretary-input" placeholder="명령을 입력하세요... (예: 할 일 추가: 보고서 작성)" />
+      <button class="secretary-send" onclick="secretarySubmit()">➤</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── 오늘 날짜 ──
+const days = ['일','월','화','수','목','금','토'];
+const now = new Date();
+const dateStr = `${now.getFullYear()}년 ${now.getMonth()+1}월 ${now.getDate()}일 (${days[now.getDay()]})`;
+document.getElementById('today-str').textContent = dateStr;
+
+// ── 실시간 시계 ──
+function updateClock() {
+  const t = new Date();
+  const h = String(t.getHours()).padStart(2,'0');
+  const m = String(t.getMinutes()).padStart(2,'0');
+  const s = String(t.getSeconds()).padStart(2,'0');
+  document.getElementById('live-time').textContent = `${h}:${m}:${s}`;
+}
+updateClock();
+setInterval(updateClock, 1000);
+
+// ── 날씨 (Open-Meteo, 위치 기반, 무료/키 불필요) ──
+const WEATHER_ICONS = {
+  0:'☀️', 1:'🌤️', 2:'⛅', 3:'☁️',
+  45:'🌫️', 48:'🌫️',
+  51:'🌦️', 53:'🌦️', 55:'🌧️',
+  61:'🌧️', 63:'🌧️', 65:'🌧️',
+  71:'🌨️', 73:'🌨️', 75:'❄️',
+  80:'🌦️', 81:'🌧️', 82:'⛈️',
+  95:'⛈️', 96:'⛈️', 99:'⛈️'
+};
+const WEATHER_DESC = {
+  0:'맑음', 1:'대체로 맑음', 2:'구름 조금', 3:'흐림',
+  45:'안개', 48:'안개',
+  51:'이슬비', 53:'이슬비', 55:'이슬비',
+  61:'비', 63:'비', 65:'강한 비',
+  71:'눈', 73:'눈', 75:'강한 눈',
+  80:'소나기', 81:'소나기', 82:'강한 소나기',
+  95:'뇌우', 96:'뇌우', 99:'뇌우'
+};
+async function loadWeather() {
+  try {
+    const pos = await new Promise((res, rej) =>
+      navigator.geolocation.getCurrentPosition(res, rej, { timeout: 5000 })
+    );
+    const { latitude: lat, longitude: lon } = pos.coords;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,weathercode&timezone=auto`;
+    const data = await fetch(url).then(r => r.json());
+    const temp = Math.round(data.current.temperature_2m);
+    const code = data.current.weathercode;
+    document.getElementById('w-icon').textContent = WEATHER_ICONS[code] ?? '🌡️';
+    document.getElementById('w-temp').textContent = `${temp}°`;
+    document.getElementById('w-desc').textContent = WEATHER_DESC[code] ?? '';
+  } catch {
+    document.getElementById('w-desc').textContent = '위치 권한 필요';
+  }
+}
+loadWeather();
+
+// ── 할 일 데이터 ──
+const STORAGE_KEY = 'dashboard_todos';
+let todos = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null') || [
+  { id:1, text:'B안 기반 영상 광고 기획서 초안 작성', priority:'high', assignee:'박사원', done:false },
+  { id:2, text:'3월 프로모션 기획안 초안 작성', priority:'high', assignee:'김대리', done:false },
+  { id:3, text:'인플루언서 미팅 일정 조율', priority:'high', assignee:'이과장', done:false },
+  { id:4, text:'경쟁사 C사 신규 캠페인 분석', priority:'mid', assignee:'박사원', done:false },
+  { id:5, text:'예산 추가 요청서(+200만원) 작성', priority:'mid', assignee:'정팀장', done:false },
+  { id:6, text:'SNS 광고 A/B 테스트 결과 공유', priority:'low', assignee:'이과장', done:true },
+  { id:7, text:'블로그 콘텐츠 3건 검수 완료', priority:'low', assignee:'김대리', done:true },
+];
+let nextId = todos.reduce((m,t) => Math.max(m, t.id), 0) + 1;
+
+function saveTodos() {
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(todos));
+}
+
+function priorityLabel(p) {
+  return { high:'높음', mid:'보통', low:'낮음' }[p];
+}
+
+function renderTodos() {
+  const list = document.getElementById('todo-list');
+  const order = { high:0, mid:1, low:2 };
+  const sorted = [...todos].sort((a,b) => {
+    if (a.done !== b.done) return a.done ? 1 : -1;
+    return order[a.priority] - order[b.priority];
+  });
+
+  list.innerHTML = sorted.map(t => `
+    <div class="todo-item ${t.done ? 'done' : ''}" id="todo-${t.id}">
+      <input type="checkbox" class="todo-check" ${t.done ? 'checked' : ''} onchange="toggleTodo(${t.id})">
+      <span class="todo-text">${t.text}</span>
+      ${t.assignee ? `<span class="todo-assignee">${t.assignee}</span>` : ''}
+      <span class="priority-badge ${t.priority}">${priorityLabel(t.priority)}</span>
+      <button class="todo-delete" onclick="deleteTodo(${t.id})">×</button>
+    </div>
+  `).join('');
+
+  const total = todos.length;
+  const done = todos.filter(t => t.done).length;
+  document.getElementById('stat-total').textContent = total;
+  document.getElementById('stat-done').textContent = `완료 ${done} / 미완료 ${total - done}`;
+}
+
+function addTodo() {
+  const input = document.getElementById('todo-input');
+  const priority = document.getElementById('todo-priority').value;
+  const text = input.value.trim();
+  if (!text) { input.focus(); return; }
+  todos.push({ id: nextId++, text, priority, assignee:'', done:false });
+  saveTodos();
+  renderTodos();
+  input.value = '';
+  input.focus();
+}
+
+function toggleTodo(id) {
+  const t = todos.find(t => t.id === id);
+  if (t) { t.done = !t.done; saveTodos(); renderTodos(); }
+}
+
+function deleteTodo(id) {
+  todos = todos.filter(t => t.id !== id);
+  saveTodos();
+  renderTodos();
+}
+
+document.getElementById('todo-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') addTodo();
+});
+document.getElementById('todo-input').addEventListener('input', e => {
+  const v = e.target.value;
+  if (v === '/김비서') {
+    e.target.value = '';
+    e.target.classList.remove('slash-mode');
+    openSecretary();
+  } else if (v.startsWith('/')) {
+    e.target.classList.add('slash-mode');
+  } else {
+    e.target.classList.remove('slash-mode');
+  }
+});
+
+renderTodos();
+
+// ── 프로젝트 진행률 ──
+const projects = [
+  { name:'영상 광고 3편 제작', pct:20, color:'#58a6ff', sub:'담당: 박사원 · 이번 주 진행 중' },
+  { name:'3월 프로모션 기획안', pct:35, color:'#ffa657', sub:'담당: 김대리 · 마감: 수요일' },
+  { name:'인플루언서 협업 세팅', pct:60, color:'#d2a8ff', sub:'담당: 이과장 · 1곳 회신 완료' },
+  { name:'4월 신제품 런칭 준비', pct:15, color:'#3fb950', sub:'티저 3월 4주차 시작 예정' },
+  { name:'SNS 캠페인 최적화', pct:80, color:'#f78166', sub:'B안 영상형 성과 2.3배 ↑' },
+];
+
+const plist = document.getElementById('project-list');
+plist.innerHTML = projects.map(p => `
+  <div class="project-item">
+    <div class="project-meta">
+      <span class="project-name">${p.name}</span>
+      <span class="project-pct" style="color:${p.color}">${p.pct}%</span>
+    </div>
+    <div class="progress-bar-bg">
+      <div class="progress-bar-fill" style="width:${p.pct}%; background:${p.color}"></div>
+    </div>
+    <div class="project-sub">${p.sub}</div>
+  </div>
+`).join('');
+
+// ── 매출 차트 (동적) ──
+const SALES_KEY = 'dashboard_sales';
+let salesData = JSON.parse(localStorage.getItem(SALES_KEY) || 'null') || {
+  labels: ['무선 이어폰', '블루투스 스피커', '텀블러', '보조배터리', '무선 충전기', '에코백'],
+  values: [28836000, 9600000, 11525000, 7030000, 5850000, 6165000],
+};
+const chartColors = ['#58a6ff','#3fb950','#ffa657','#d2a8ff','#f78166','#79c0ff','#ff7eb3','#ffdd57'];
+
+function saveSales() { localStorage.setItem(SALES_KEY, JSON.stringify(salesData)); }
+
+const SALES_ROWS_KEY = 'dashboard_sales_rows';
+let salesRows = JSON.parse(localStorage.getItem(SALES_ROWS_KEY) || 'null') || [
+  { date:'02/10', product:'무선 이어폰',    region:'대구', amount:5162000 },
+  { date:'02/10', product:'텀블러',          region:'서울', amount:1675000 },
+  { date:'02/10', product:'보조배터리',      region:'서울', amount:1365000 },
+  { date:'02/05', product:'블루투스 스피커', region:'서울', amount:3000000 },
+  { date:'02/05', product:'에코백',          region:'대구', amount:1800000 },
+  { date:'02/01', product:'무선 이어폰',     region:'서울', amount:6230000 },
+  { date:'02/01', product:'텀블러',          region:'부산', amount:2375000 },
+];
+function saveSalesRows() { localStorage.setItem(SALES_ROWS_KEY, JSON.stringify(salesRows)); }
+
+function renderSalesTable() {
+  const tbody = document.querySelector('.sales-table tbody');
+  if (!tbody) return;
+  const recent = [...salesRows].reverse().slice(0, 10);
+  tbody.innerHTML = recent.map(r => `
+    <tr>
+      <td>${r.date}</td>
+      <td>${r.product}</td>
+      <td><span class="region-badge">${r.region}</span></td>
+      <td class="amount">${r.amount.toLocaleString()}</td>
+    </tr>
+  `).join('');
+}
+renderSalesTable();
+
+const ctx = document.getElementById('salesChart').getContext('2d');
+const myChart = new Chart(ctx, {
+  type: 'doughnut',
+  data: {
+    labels: salesData.labels,
+    datasets: [{
+      data: salesData.values,
+      backgroundColor: chartColors.slice(0, salesData.labels.length),
+      borderColor: '#161b22',
+      borderWidth: 3,
+      hoverOffset: 6,
+    }]
+  },
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'right',
+        labels: { color: '#8b949e', font: { size: 11 }, padding: 10, boxWidth: 12 }
+      },
+      tooltip: {
+        callbacks: {
+          label: c => ` ${(c.raw/10000).toFixed(0)}만원`
+        }
+      }
+    },
+    cutout: '65%',
+  }
+});
+
+function updateChart(product, amount) {
+  const idx = salesData.labels.findIndex(l => l === product);
+  if (idx >= 0) {
+    salesData.values[idx] += amount;
+  } else {
+    salesData.labels.push(product);
+    salesData.values.push(amount);
+    myChart.data.datasets[0].backgroundColor = chartColors.slice(0, salesData.labels.length);
+  }
+  myChart.data.labels = salesData.labels;
+  myChart.data.datasets[0].data = salesData.values;
+  myChart.update();
+  saveSales();
+  // 요약 카드 매출 합계 업데이트
+  const total = salesData.values.reduce((a,b) => a+b, 0);
+  const el = document.querySelector('.summary-card.green .summary-value');
+  if (el) el.textContent = Math.round(total/10000).toLocaleString() + '만원';
+}
+
+// ── 김비서 ──────────────────────────────────────────
+function openSecretary() {
+  document.getElementById('secretary-overlay').classList.add('open');
+  const chat = document.getElementById('secretary-chat');
+  if (chat.children.length === 0) {
+    addBotMsg('안녕하세요! 저는 <b>김비서</b>입니다 🤖<br>할 일이나 매출 데이터를 자연어로 업데이트해 드릴게요.<br><br>예시:<br>• <b>할 일 추가: 보고서 작성 (높음)</b><br>• <b>매출 추가: 무선 이어폰 서울 5,000,000</b><br>• <b>완료: 기획서</b><br>• <b>현황 알려줘</b>');
+  }
+  setTimeout(() => document.getElementById('secretary-input').focus(), 100);
+}
+
+function closeSecretary(e) {
+  if (!e || e.target === document.getElementById('secretary-overlay')) {
+    document.getElementById('secretary-overlay').classList.remove('open');
+  }
+}
+
+function addBotMsg(html) {
+  const chat = document.getElementById('secretary-chat');
+  const el = document.createElement('div');
+  el.className = 'chat-bubble bot';
+  el.innerHTML = html;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function addUserMsg(text) {
+  const chat = document.getElementById('secretary-chat');
+  const el = document.createElement('div');
+  el.className = 'chat-bubble user';
+  el.textContent = text;
+  chat.appendChild(el);
+  chat.scrollTop = chat.scrollHeight;
+}
+
+function fillHint(text) {
+  const inp = document.getElementById('secretary-input');
+  inp.value = text;
+  inp.focus();
+}
+
+document.getElementById('secretary-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') secretarySubmit();
+});
+
+function secretarySubmit() {
+  const inp = document.getElementById('secretary-input');
+  const raw = inp.value.trim();
+  if (!raw) return;
+  inp.value = '';
+  addUserMsg(raw);
+  const reply = processCommand(raw);
+  setTimeout(() => addBotMsg(reply), 200);
+}
+
+function processCommand(cmd) {
+  const c = cmd.trim();
+
+  // ── 현황 요약 ──
+  if (/현황|요약|상태/.test(c)) {
+    const total = todos.length;
+    const done  = todos.filter(t => t.done).length;
+    const totalSales = salesData.values.reduce((a,b) => a+b, 0);
+    const top = salesData.labels[salesData.values.indexOf(Math.max(...salesData.values))];
+    return `📊 <b>현재 현황 요약</b><br><br>
+✅ 할 일: 전체 ${total}건 (완료 ${done} / 미완료 ${total - done})<br>
+💰 누적 매출: ${Math.round(totalSales/10000).toLocaleString()}만원<br>
+🏆 최고 매출 제품: <b>${top}</b>`;
+  }
+
+  // ── 할 일 추가 ──
+  const addMatch = c.match(/^(?:할\s*일\s*추가|추가)\s*[:：]?\s*(.+)/);
+  if (addMatch) {
+    let text = addMatch[1].trim();
+    let priority = 'mid';
+    let assignee = '';
+
+    // 우선순위 파싱
+    if (/높음|긴급|high|🔴/.test(text))       { priority = 'high'; text = text.replace(/[（(]?높음|긴급|high|🔴[）)]?/g,'').trim(); }
+    else if (/낮음|여유|low|🟢/.test(text))   { priority = 'low';  text = text.replace(/[（(]?낮음|여유|low|🟢[）)]?/g,'').trim(); }
+    else if (/보통|mid|🟡/.test(text))        { priority = 'mid';  text = text.replace(/[（(]?보통|mid|🟡[）)]?/g,'').trim(); }
+    // 담당자 파싱 (예: "박사원 담당")
+    const asMatch = text.match(/\s+([\uAC00-\uD7A3]+(?:사원|대리|과장|팀장|부장)?)\s*담당/);
+    if (asMatch) { assignee = asMatch[1]; text = text.replace(asMatch[0],'').trim(); }
+    // 괄호 정리
+    text = text.replace(/[()（）\[\]]/g,'').trim();
+    if (!text) return '<span class="err">할 일 내용이 비어 있어요.</span>';
+
+    todos.push({ id: nextId++, text, priority, assignee, done: false });
+    saveTodos(); renderTodos();
+    return `<span class="ok">✔ 추가 완료!</span><br><b>${text}</b><br>우선순위: ${priorityLabel(priority)}${assignee ? ' · 담당: '+assignee : ''}`;
+  }
+
+  // ── 자연어 할 일 추가 ("~해야 해", "~해줘" 포함) ──
+  const natMatch = c.match(/(.+?)(?:를?|을?)\s*(?:해야|추가해|등록해|넣어)/);
+  if (natMatch) {
+    const text = natMatch[1].trim();
+    todos.push({ id: nextId++, text, priority: 'mid', assignee: '', done: false });
+    saveTodos(); renderTodos();
+    return `<span class="ok">✔ 추가 완료!</span><br><b>${text}</b> 를 할 일에 추가했어요.`;
+  }
+
+  // ── 완료 처리 ──
+  const doneMatch = c.match(/^(?:완료|체크|done)\s*[:：]?\s*(.+)/);
+  if (doneMatch) {
+    const keyword = doneMatch[1].trim();
+    const targets = todos.filter(t => !t.done && t.text.includes(keyword));
+    if (targets.length === 0) return `<span class="err">"${keyword}" 가 포함된 미완료 항목을 찾지 못했어요.</span>`;
+    targets.forEach(t => t.done = true);
+    saveTodos(); renderTodos();
+    return `<span class="ok">✔ ${targets.length}건 완료 처리!</span><br>${targets.map(t=>`• ${t.text}`).join('<br>')}`;
+  }
+
+  // ── 삭제 ──
+  const delMatch = c.match(/^(?:삭제|제거|delete)\s*[:：]?\s*(.+)/);
+  if (delMatch) {
+    const keyword = delMatch[1].trim();
+    const before = todos.length;
+    todos = todos.filter(t => !t.text.includes(keyword));
+    if (todos.length === before) return `<span class="err">"${keyword}" 가 포함된 항목을 찾지 못했어요.</span>`;
+    saveTodos(); renderTodos();
+    return `<span class="ok">✔ ${before - todos.length}건 삭제 완료!</span>`;
+  }
+
+  // ── 매출 추가 ──
+  const saleMatch = c.match(/^(?:매출\s*추가|판매\s*추가)\s*[:：]?\s*(.+)/);
+  if (saleMatch) {
+    const parts = saleMatch[1].trim().split(/\s+/);
+    // 형식: 제품명 지역 금액  (제품명이 두 단어일 수도 있으므로 숫자로 금액 찾기)
+    const amtIdx = parts.findIndex(p => /^[\d,]+$/.test(p));
+    if (amtIdx < 0) return '<span class="err">금액을 숫자로 입력해 주세요.<br>예: <b>매출 추가: 무선 이어폰 서울 1500000</b></span>';
+    const amount = parseInt(parts[amtIdx].replace(/,/g,''), 10);
+    const region = amtIdx >= 2 ? parts[amtIdx-1] : '';
+    const product = parts.slice(0, Math.max(1, amtIdx - 1)).join(' ') || parts[0];
+    const today = new Date();
+    const dateLabel = `${String(today.getMonth()+1).padStart(2,'0')}/${String(today.getDate()).padStart(2,'0')}`;
+    salesRows.push({ date: dateLabel, product, region, amount });
+    saveSalesRows();
+    renderSalesTable();
+    updateChart(product, amount);
+    return `<span class="ok">✔ 매출 등록 완료!</span><br><b>${product}</b> · ${region} · ${amount.toLocaleString()}원<br>차트와 테이블이 업데이트 되었어요.`;
+  }
+
+  // ── 도움말 ──
+  if (/도움|help|명령/.test(c)) {
+    return `📖 <b>사용 가능한 명령어</b><br><br>
+• <b>할 일 추가: [내용] (높음/보통/낮음)</b><br>
+• <b>완료: [키워드]</b> — 해당 할 일 완료 처리<br>
+• <b>삭제: [키워드]</b> — 해당 할 일 삭제<br>
+• <b>매출 추가: [제품] [지역] [금액]</b><br>
+• <b>현황 알려줘</b> — 요약 보고`;
+  }
+
+  return `🤔 명령을 이해하지 못했어요.<br>"<b>도움말</b>" 을 입력하면 사용법을 알려드릴게요.`;
+}
+</script>
+</body>
+</html>
